@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class AppObject extends Model
 {
-protected $fillable = ['name', 'price', 'description'];
+    protected $fillable = ['name', 'description', 'active'];
 
 }
