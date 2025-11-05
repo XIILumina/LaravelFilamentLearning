@@ -12,24 +12,21 @@
             </a>
 
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                    <flux:navlist.item icon="home" :href="route('objects.index')" :current="request()->routeIs('objects.index')" wire:navigate>{{ __('Objects') }}</flux:navlist.item>
-                    <flux:navlist.item icon="home" :href="route('games.index')" :current="request()->routeIs('games.index')" wire:navigate>{{ __('Games') }}</flux:navlist.item>
+                <flux:navlist.group :heading="__('Navigation')" class="grid">
+                    <flux:navlist.item icon="squares-2x2" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="puzzle-piece" :href="route('games.index')" :current="request()->routeIs('games.*')" wire:navigate>{{ __('Games') }}</flux:navlist.item>
+                    <flux:navlist.item icon="tag" :href="route('genres.index')" :current="request()->routeIs('genres.*')" wire:navigate>{{ __('Genres') }}</flux:navlist.item>
+                    <flux:navlist.item icon="heart" :href="route('wishlist.index')" :current="request()->routeIs('wishlist.*')" wire:navigate>{{ __('My Wishlist') }}</flux:navlist.item>
+                </flux:navlist.group>
+                
+                <flux:navlist.group :heading="__('Community')" class="grid">
+                    <flux:navlist.item icon="chat-bubble-left-ellipsis" :href="route('blog.index')" :current="request()->routeIs('blog.*')" wire:navigate>{{ __('Blog') }}</flux:navlist.item>
+                    <flux:navlist.item icon="user-group" :href="route('community.index')" :current="request()->routeIs('community.*')" wire:navigate>{{ __('Community') }}</flux:navlist.item>
+                    <flux:navlist.item icon="envelope" :href="route('contact.index')" :current="request()->routeIs('contact.*')" wire:navigate>{{ __('Contact') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
             <flux:spacer />
-
-            <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
-
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
-            </flux:navlist>
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">

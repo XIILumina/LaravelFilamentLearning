@@ -1,41 +1,91 @@
 <x-layouts.app :title="'Game Database'">
-    <div class="px-6 py-8">
-        <h1 class="text-4xl font-bold text-indigo-400 mb-8 text-center">🎮 Game Database</h1>
+    <div class="px-6 py-10 bg-gradient-to-b from-gray-900 via-gray-850 to-gray-900 min-h-screen">
+        @if(session('success'))
+            <div class="bg-green-600 text-white px-4 py-2 rounded-lg mb-6 max-w-4xl mx-auto">
+                {{ session('success') }}
+            </div>
+        @endif
+        
+        @if(session('info'))
+            <div class="bg-blue-600 text-white px-4 py-2 rounded-lg mb-6 max-w-4xl mx-auto">
+                {{ session('info') }}
+            </div>
+        @endif
+        
+        <h1 class="text-5xl font-extrabold text-center text-indigo-400 mb-12 tracking-wide drop-shadow-lg">
+            🎮 Game Database
+        </h1>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach ($games as $game)
-                <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:scale-105 transition-transform duration-300">
+                <div class="bg-gray-850 border border-gray-700 rounded-2xl shadow-xl overflow-hidden 
+                            hover:scale-[1.03] hover:shadow-indigo-900/30 transition-all duration-300">
                     @if($game->image_url)
-                        <img src="{{ asset('storage/' . $game->image_url) }}" alt="{{ $game->title }}" class="w-full h-48 object-cover">
+                        <img src="{{ asset('storage/' . $game->image_url) }}" 
+                             alt="{{ $game->title }}" 
+                             class="w-full h-56 object-cover opacity-90 hover:opacity-100 transition duration-300">
                     @else
-                        <div class="w-full h-48 bg-gray-700 flex items-center justify-center text-gray-400">
+                        <div class="w-full h-56 bg-gray-800 flex items-center justify-center text-gray-500 text-sm">
                             No Image
                         </div>
                     @endif
 
-                    <div class="p-4">
-                        <h2 class="text-xl font-semibold text-indigo-300 mb-2">{{ $game->title }}</h2>
-                        <p class="text-gray-400 text-sm mb-2">Developer: {{ $game->developer->name ?? 'Unknown' }}</p>
-                        <p class="text-gray-300 mb-3">⭐ Rating: <strong>{{ number_format($game->rating, 1) }}/10</strong></p>
-                        
-                        <p class="text-gray-300 mb-3 text-sm">
-                            Genres: {{ $game->genres->pluck('name')->join(', ') ?: 'N/A' }}
+                    <div class="p-5">
+                        <h2 class="text-2xl font-semibold text-indigo-300 mb-3">{{ $game->title }}</h2>
+
+                        <p class="text-gray-400 text-sm mb-1"> Developer: 
+                            <span class="text-gray-300">{{ $game->developer->name ?? 'Unknown' }}</span>
                         </p>
-                        <p class="text-gray-300 mb-3 text-sm">
-                            Platforms: {{ $game->platforms->pluck('name')->join(', ') ?: 'N/A' }}
+                        <p class="text-gray-400 text-sm mb-2"> Rating: 
+                            <span class="font-bold text-indigo-400">{{ number_format($game->rating, 1) }}/10</span>
                         </p>
 
-                        <a href="{{ route('games.show', $game->id) }}" 
-                           class="inline-block mt-2 w-full text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded text-white font-semibold">
-                            View Details
-                        </a>
+                        <div class="text-sm text-gray-400 mb-3">
+                             Genres: 
+                            <span class="text-gray-300">{{ $game->genres->pluck('name')->join(', ') ?: 'N/A' }}</span>
+                        </div>
+                        <div class="text-sm text-gray-400 mb-4">
+                             Platforms: 
+                            <span class="text-gray-300">{{ $game->platforms->pluck('name')->join(', ') ?: 'N/A' }}</span>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <a href="{{ route('games.show', $game->id) }}" 
+                               class="flex-1 text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg 
+                                      text-white font-semibold tracking-wide transition duration-200">
+                                View Details
+                            </a>
+                            
+                            @auth
+                                @if($game->isWishlistedBy())
+                                    <form action="{{ route('wishlist.remove', $game) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="px-3 py-2 bg-red-600 hover:bg-red-500 rounded-lg text-white transition duration-200"
+                                                title="Remove from wishlist">
+                                            ❤️
+                                        </button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('wishlist.add', $game) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" 
+                                                class="px-3 py-2 bg-gray-600 hover:bg-pink-600 rounded-lg text-white transition duration-200"
+                                                title="Add to wishlist">
+                                            🤍
+                                        </button>
+                                    </form>
+                                @endif
+                            @endauth
+                        </div>
                     </div>
                 </div>
             @endforeach
         </div>
 
-        <div class="mt-8">
-            {{ $games->links() }}
+        <div class="mt-10">
+            {{ $games->links('pagination::tailwind') }}
         </div>
     </div>
 </x-layouts.app>
