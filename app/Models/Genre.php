@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Genre extends Model
 {
-               protected $fillable = [
+    protected $fillable = [
         'name',
     ];
     public function games()

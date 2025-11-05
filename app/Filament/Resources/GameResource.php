@@ -3,34 +3,78 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\GameResource\Pages;
-use App\Filament\Resources\GameResource\RelationManagers;
 use App\Models\Game;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-
-use function Laravel\Prompts\form;
 
 class GameResource extends Resource
 {
     protected static ?string $model = Game::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Games';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')->required(),
-                Forms\Components\TextArea::make('description')->required(),
-                Forms\Components\DatePicker::make('release_date')->required(),
-                Forms\Components\Select::make('publisher')->required(),
-                Forms\Components\TextInput::make('rating')->required(),
-                Forms\Components\TextInput::make('image_url')->required(),
+                Forms\Components\TextInput::make('title')
+                    ->label('Title')
+                    ->required()
+                    ->maxLength(255),
+
+                Forms\Components\Textarea::make('description')
+                    ->label('Description')
+                    ->rows(4),
+
+                Forms\Components\DatePicker::make('release_date')
+                    ->label('Release date'),
+
+                // Publisher as plain text input (you might prefer relationship)
+                Forms\Components\TextInput::make('publisher')
+                    ->label('Publisher')
+                    ->maxLength(255),
+
+                Forms\Components\TextInput::make('rating')
+                    ->label('Rating (0–10)')
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(10)
+                    ->step(0.1)
+                    ->required(),
+
+                // File upload for image (stores path in image_url)
+                Forms\Components\FileUpload::make('image_url')
+                    ->label('Game Cover')
+                    ->image()
+                    ->directory('games')
+                    ->preserveFilenames(), // optional
+
+                Forms\Components\Toggle::make('featured')
+                    ->label('Featured'),
+
+                // Relationship selects
+                Forms\Components\Select::make('developer_id')
+                    ->label('Developer')
+                    ->relationship('developer', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                // Use Select::multiple for many-to-many (preferred over deprecated MultiSelect)
+                Forms\Components\Select::make('genres')
+                    ->label('Genres')
+                    ->relationship('genres', 'name')
+                    ->multiple()
+                    ->preload(),
+
+                Forms\Components\Select::make('platforms')
+                    ->label('Platforms')
+                    ->relationship('platforms', 'name')
+                    ->multiple()
+                    ->preload(),
             ]);
     }
 
@@ -38,47 +82,53 @@ class GameResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')            
-                            ->required()
-                            ->maxLength(255),
-                Tables\Columns\TextColumn::make('description'),
-                Tables\Columns\TextColumn::make('release_date'),
-                Tables\Columns\TextColumn::make('publisher'),
+                Tables\Columns\TextColumn::make('title')
+                    ->searchable()
+                    ->sortable()
+                    ->label('Title'),
+
+                Tables\Columns\TextColumn::make('developer.name')
+                    ->label('Developer')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('rating')
-                            ->numeric()
-                            ->minValue(0)
-                            ->maxValue(10)
-                            ->step(0.1)
-                            ->default(0)
-                            ->required()
-                            ->label('Rating (0–10)'),
-                Tables\Columns\TextColumn::make('image_url')            
-                        ->label('Game Cover')
-                        ->directory('games'),
-                                Forms\Components\Toggle::make('featured'),
+                    ->label('Rating')
+                    ->sortable()
+                    ->formatStateUsing(fn ($state) => $state !== null ? number_format($state, 1).'/10' : '-'),
 
-        Forms\Components\Select::make('developer_id')
-            ->relationship('developer', 'name')
-            ->label('Developer'),
+                Tables\Columns\IconColumn::make('featured')
+                    ->boolean()
+                    ->label('Featured'),
 
-        Forms\Components\MultiSelect::make('genres')
-            ->relationship('genres', 'name')
-            ->label('Genres'),
+                Tables\Columns\ImageColumn::make('image_url')
+                    ->label('Cover')
+                    ->disk('public') // ensure this disk exists
+                    ->rounded(),
 
-        Forms\Components\MultiSelect::make('platforms')
-            ->relationship('platforms', 'name')
-            ->label('Platforms'),
+                // display comma-separated genres
+                Tables\Columns\TextColumn::make('genres')
+                    ->label('Genres')
+                    ->formatStateUsing(fn ($state, $record) => $record->genres->pluck('name')->join(', '))
+                    ->wrap(),
+
+                Tables\Columns\TextColumn::make('platforms')
+                    ->label('Platforms')
+                    ->formatStateUsing(fn ($state, $record) => $record->platforms->pluck('name')->join(', '))
+                    ->wrap(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created')
+                    ->date(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
