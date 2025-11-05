@@ -1,5 +1,5 @@
 <x-layouts.app :title="'Game Database'">
-    <div class="px-6 py-10 bg-gradient-to-b from-gray-900 via-gray-850 to-gray-900 min-h-screen">
+    <div class="px-6 py-10 bg-gradient-to-b from-zinc-900 via-zinc-850 to-zinc-900 min-h-screen">
         @if(session('success'))
             <div class="bg-green-600 text-white px-4 py-2 rounded-lg mb-6 max-w-4xl mx-auto">
                 {{ session('success') }}
@@ -18,14 +18,14 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             @foreach ($games as $game)
-                <div class="bg-gray-850 border border-gray-700 rounded-2xl shadow-xl overflow-hidden 
+                <div class="bg-zinc-850 border border-zinc-700 rounded-2xl shadow-xl overflow-hidden 
                             hover:scale-[1.03] hover:shadow-indigo-900/30 transition-all duration-300">
                     @if($game->image_url)
                         <img src="{{ asset('storage/' . $game->image_url) }}" 
                              alt="{{ $game->title }}" 
                              class="w-full h-56 object-cover opacity-90 hover:opacity-100 transition duration-300">
                     @else
-                        <div class="w-full h-56 bg-gray-800 flex items-center justify-center text-gray-500 text-sm">
+                        <div class="w-full h-56 bg-zinc-800 flex items-center justify-center text-zinc-500 text-sm">
                             No Image
                         </div>
                     @endif
@@ -33,20 +33,20 @@
                     <div class="p-5">
                         <h2 class="text-2xl font-semibold text-indigo-300 mb-3">{{ $game->title }}</h2>
 
-                        <p class="text-gray-400 text-sm mb-1"> Developer: 
-                            <span class="text-gray-300">{{ $game->developer->name ?? 'Unknown' }}</span>
+                        <p class="text-zinc-400 text-sm mb-1"> Developer: 
+                            <span class="text-zinc-300">{{ $game->developer->name ?? 'Unknown' }}</span>
                         </p>
-                        <p class="text-gray-400 text-sm mb-2"> Rating: 
+                        <p class="text-zinc-400 text-sm mb-2"> Rating: 
                             <span class="font-bold text-indigo-400">{{ number_format($game->rating, 1) }}/10</span>
                         </p>
 
-                        <div class="text-sm text-gray-400 mb-3">
+                        <div class="text-sm text-zinc-400 mb-3">
                              Genres: 
-                            <span class="text-gray-300">{{ $game->genres->pluck('name')->join(', ') ?: 'N/A' }}</span>
+                            <span class="text-zinc-300">{{ $game->genres->pluck('name')->join(', ') ?: 'N/A' }}</span>
                         </div>
-                        <div class="text-sm text-gray-400 mb-4">
+                        <div class="text-sm text-zinc-400 mb-4">
                              Platforms: 
-                            <span class="text-gray-300">{{ $game->platforms->pluck('name')->join(', ') ?: 'N/A' }}</span>
+                            <span class="text-zinc-300">{{ $game->platforms->pluck('name')->join(', ') ?: 'N/A' }}</span>
                         </div>
 
                         <div class="flex gap-2">
@@ -71,7 +71,7 @@
                                     <form action="{{ route('wishlist.add', $game) }}" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" 
-                                                class="px-3 py-2 bg-gray-600 hover:bg-pink-600 rounded-lg text-white transition duration-200"
+                                                class="px-3 py-2 bg-zinc-600 hover:bg-pink-600 rounded-lg text-white transition duration-200"
                                                 title="Add to wishlist">
                                             🤍
                                         </button>

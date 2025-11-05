@@ -1,5 +1,5 @@
 <x-layouts.app :title="$game->title">
-    <div class="px-6 py-10 bg-gradient-to-b from-gray-900 via-gray-850 to-gray-900 min-h-screen">
+    <div class="px-6 py-10 bg-gradient-to-b from-zinc-900 via-zinc-850 to-zinc-900 min-h-screen">
         @if(session('success'))
             <div class="bg-green-600 text-white px-4 py-2 rounded-lg mb-6 max-w-5xl mx-auto">
                 {{ session('success') }}
@@ -21,13 +21,13 @@
                 Back to all games
             </a>
 
-            <div class="bg-gray-850 border border-gray-700 rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-zinc-850 border border-zinc-700 rounded-2xl shadow-xl overflow-hidden">
                 @if($game->image_url)
                     <img src="{{ asset('storage/' . $game->image_url) }}" 
                          alt="{{ $game->title }}" 
                          class="w-full h-80 object-cover opacity-90 hover:opacity-100 transition duration-300">
                 @else
-                    <div class="w-full h-80 bg-gray-800 flex items-center justify-center text-gray-500 text-sm">
+                    <div class="w-full h-80 bg-zinc-800 flex items-center justify-center text-zinc-500 text-sm">
                         No Image
                     </div>
                 @endif
@@ -35,11 +35,11 @@
                 <div class="p-8">
                     <h1 class="text-4xl font-bold text-indigo-400 mb-4">{{ $game->title }}</h1>
 
-                    <p class="text-gray-400 text-sm mb-3">
-                         Developer: <span class="text-gray-300">{{ $game->developer->name ?? 'Unknown' }}</span>
+                    <p class="text-zinc-400 text-sm mb-3">
+                         Developer: <span class="text-zinc-300">{{ $game->developer->name ?? 'Unknown' }}</span>
                     </p>
 
-                    <p class="text-gray-300 mb-6 leading-relaxed">{{ $game->description }}</p>
+                    <p class="text-zinc-300 mb-6 leading-relaxed">{{ $game->description }}</p>
 
                     <div class="flex flex-wrap gap-2 mb-6">
                         <span class="bg-indigo-700/70 text-white px-3 py-1 rounded-full text-sm">
@@ -47,18 +47,18 @@
                         </span>
 
                         @foreach($game->genres as $genre)
-                            <span class="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">{{ $genre->name }}</span>
+                            <span class="bg-zinc-700 text-zinc-300 px-3 py-1 rounded-full text-sm">{{ $genre->name }}</span>
                         @endforeach
 
                         @foreach($game->platforms as $platform)
-                            <span class="bg-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">{{ $platform->name }}</span>
+                            <span class="bg-zinc-700 text-zinc-300 px-3 py-1 rounded-full text-sm">{{ $platform->name }}</span>
                         @endforeach
                     </div>
 
-                    <div class="border-t border-gray-700 pt-4 text-sm text-gray-400">
-                        <p> Publisher: <span class="text-gray-300">{{ $game->publisher ?? 'Unknown' }}</span></p>
+                    <div class="border-t border-zinc-700 pt-4 text-sm text-zinc-400">
+                        <p> Publisher: <span class="text-zinc-300">{{ $game->publisher ?? 'Unknown' }}</span></p>
                         <p> Release Date: 
-                            <span class="text-gray-300">{{ optional($game->release_date)->format('F j, Y') ?? 'Unknown' }}</span>
+                            <span class="text-zinc-300">{{ optional($game->release_date)->format('F j, Y') ?? 'Unknown' }}</span>
                         </p>
 
                         @if($game->featured)
@@ -67,7 +67,7 @@
                     </div>
                     
                     @auth
-                        <div class="border-t border-gray-700 pt-6 mt-6">
+                        <div class="border-t border-zinc-700 pt-6 mt-6">
                             @if($game->isWishlistedBy())
                                 <form action="{{ route('wishlist.remove', $game) }}" method="POST" class="inline">
                                     @csrf
@@ -88,8 +88,8 @@
                             @endif
                         </div>
                     @else
-                        <div class="border-t border-gray-700 pt-6 mt-6">
-                            <p class="text-gray-400 text-sm">
+                        <div class="border-t border-zinc-700 pt-6 mt-6">
+                            <p class="text-zinc-400 text-sm">
                                 <a href="{{ route('login') }}" class="text-indigo-400 hover:text-indigo-300">Log in</a> 
                                 to add games to your wishlist
                             </p>

@@ -15,18 +15,18 @@
         @endif
 
         @if($games->count() > 0)
-            <p class="text-gray-400 mb-6">{{ $games->count() }} game{{ $games->count() !== 1 ? 's' : '' }} in your wishlist</p>
+            <p class="text-zinc-400 mb-6">{{ $games->count() }} game{{ $games->count() !== 1 ? 's' : '' }} in your wishlist</p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($games as $game)
-                    <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:transform hover:scale-105 transition-all duration-200">
+                    <div class="bg-zinc-800 rounded-xl shadow-lg overflow-hidden hover:transform hover:scale-105 transition-all duration-200">
                         <a href="{{ route('games.show', $game) }}" class="block">
                             @if($game->image_url)
                                 <img src="{{ asset('storage/' . $game->image_url) }}" 
                                      alt="{{ $game->title }}" 
                                      class="w-full h-48 object-cover">
                             @else
-                                <div class="w-full h-48 bg-gray-700 flex items-center justify-center text-gray-400">
+                                <div class="w-full h-48 bg-zinc-700 flex items-center justify-center text-zinc-400">
                                     No Image
                                 </div>
                             @endif
@@ -36,23 +36,23 @@
                             <h3 class="text-xl font-semibold text-indigo-400 mb-2">
                                 <a href="{{ route('games.show', $game) }}" class="hover:text-indigo-300">{{ $game->title }}</a>
                             </h3>
-                            <p class="text-gray-400 text-sm mb-2">{{ $game->developer->name ?? 'Unknown Developer' }}</p>
-                            <p class="text-gray-300 text-sm mb-3 line-clamp-2">{{ Str::limit($game->description, 100) }}</p>
+                            <p class="text-zinc-400 text-sm mb-2">{{ $game->developer->name ?? 'Unknown Developer' }}</p>
+                            <p class="text-zinc-300 text-sm mb-3 line-clamp-2">{{ Str::limit($game->description, 100) }}</p>
                             
                             <div class="flex flex-wrap gap-2 mb-3">
                                 <span class="bg-indigo-700 px-2 py-1 rounded text-xs">⭐ {{ number_format($game->rating, 1) }}</span>
                                 @if($game->featured)
                                     <span class="bg-green-600 px-2 py-1 rounded text-xs">🔥 Featured</span>
                                 @endif
-                                <span class="bg-gray-600 px-2 py-1 rounded text-xs">{{ optional($game->release_date)->format('Y') }}</span>
+                                <span class="bg-zinc-600 px-2 py-1 rounded text-xs">{{ optional($game->release_date)->format('Y') }}</span>
                             </div>
                             
                             <div class="flex flex-wrap gap-1 mb-3">
                                 @foreach($game->genres->take(3) as $genre)
-                                    <span class="bg-gray-700 px-2 py-1 rounded text-xs">{{ $genre->name }}</span>
+                                    <span class="bg-zinc-700 px-2 py-1 rounded text-xs">{{ $genre->name }}</span>
                                 @endforeach
                                 @if($game->genres->count() > 3)
-                                    <span class="text-gray-400 text-xs px-2 py-1">+{{ $game->genres->count() - 3 }} more</span>
+                                    <span class="text-zinc-400 text-xs px-2 py-1">+{{ $game->genres->count() - 3 }} more</span>
                                 @endif
                             </div>
                             
@@ -79,9 +79,9 @@
         @else
             <!-- Empty Wishlist -->
             <div class="text-center py-12">
-                <div class="text-gray-400 text-6xl mb-4">❤️</div>
-                <h3 class="text-2xl font-semibold text-gray-300 mb-2">Your wishlist is empty</h3>
-                <p class="text-gray-400 mb-6">Start adding games you want to play!</p>
+                <div class="text-zinc-400 text-6xl mb-4">❤️</div>
+                <h3 class="text-2xl font-semibold text-zinc-300 mb-2">Your wishlist is empty</h3>
+                <p class="text-zinc-400 mb-6">Start adding games you want to play!</p>
                 <a href="{{ route('games.index') }}" 
                    class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200">
                     Browse Games
