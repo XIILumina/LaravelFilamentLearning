@@ -7,24 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Post extends Model
+class Comment extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'title',
         'content',
-        'photo',
         'user_id',
-        'game_id',
+        'post_id',
+        'parent_id',
         'likes_count',
-        'dislikes_count',
-        'comments_count',
-        'is_pinned'
+        'dislikes_count'
     ];
 
     protected $casts = [
-        'is_pinned' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
@@ -34,19 +30,24 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function game(): BelongsTo
+    public function post(): BelongsTo
     {
-        return $this->belongsTo(Game::class);
+        return $this->belongsTo(Post::class);
     }
 
-    public function comments(): HasMany
+    public function parent(): BelongsTo
     {
-        return $this->hasMany(Comment::class);
+        return $this->belongsTo(Comment::class, 'parent_id');
+    }
+
+    public function replies(): HasMany
+    {
+        return $this->hasMany(Comment::class, 'parent_id');
     }
 
     public function likes(): HasMany
     {
-        return $this->hasMany(PostLike::class);
+        return $this->hasMany(CommentLike::class);
     }
 
     public function userLike(User $user)

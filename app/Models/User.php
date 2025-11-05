@@ -62,7 +62,27 @@ class User extends Authenticatable
             ->implode('');
     }
     public function wishlistGames()
-{
-    return $this->belongsToMany(Game::class, 'wishlists');
-}
+    {
+        return $this->belongsToMany(Game::class, 'wishlists');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function postLikes()
+    {
+        return $this->hasMany(PostLike::class);
+    }
+
+    public function commentLikes()
+    {
+        return $this->hasMany(CommentLike::class);
+    }
 }

@@ -9,6 +9,9 @@ use App\Http\Controllers\GenreController;
 use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PostLikeController;
+use App\Http\Controllers\CommentLikeController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ContactController;
 
@@ -40,7 +43,28 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/wishlist/remove/{game}', [WishlistController::class, 'destroy'])->name('wishlist.remove');
     });
 
+    // Blog routes
     Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+    
+    Route::middleware(['auth'])->group(function () {
+        // Blog management
+        Route::get('/blog/create', [BlogController::class, 'create'])->name('blog.create');
+        Route::post('/blog', [BlogController::class, 'store'])->name('blog.store');
+        Route::get('/blog/{post}/edit', [BlogController::class, 'edit'])->name('blog.edit');
+        Route::put('/blog/{post}', [BlogController::class, 'update'])->name('blog.update');
+        Route::delete('/blog/{post}', [BlogController::class, 'destroy'])->name('blog.destroy');
+        
+        // Comments
+        Route::post('/blog/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+        Route::put('/blog/comments/{comment}', [CommentController::class, 'update'])->name('comments.update');
+        Route::delete('/blog/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+        
+        // Likes
+        Route::post('/blog/posts/{post}/like', [PostLikeController::class, 'toggle'])->name('posts.like');
+        Route::post('/blog/comments/{comment}/like', [CommentLikeController::class, 'toggle'])->name('comments.like');
+    });
+    
+    Route::get('/blog/{post}', [BlogController::class, 'show'])->name('blog.show');
     Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
 
     Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
