@@ -29,14 +29,18 @@
                         <!-- Like/Dislike -->
                         <div class="flex items-center space-x-2">
                             <button onclick="toggleCommentLike({{ $comment->id }}, true)" 
-                                    class="flex items-center space-x-1 text-sm transition-colors {{ $comment->isLikedBy(auth()->user()) ? 'text-green-400' : 'text-zinc-400 hover:text-green-400' }}">
+                                    class="flex items-center space-x-1 text-sm transition-all duration-200 hover:scale-110 {{ $comment->isLikedBy(auth()->user()) ? 'text-green-400' : 'text-zinc-400 hover:text-green-400' }}"
+                                    data-comment-id="{{ $comment->id }}"
+                                    data-action="like">
                                 <span>👍</span>
-                                <span id="comment-likes-{{ $comment->id }}">{{ $comment->likes_count }}</span>
+                                <span class="like-count" data-count="{{ $comment->likes_count }}">{{ $comment->likes_count }}</span>
                             </button>
                             <button onclick="toggleCommentLike({{ $comment->id }}, false)" 
-                                    class="flex items-center space-x-1 text-sm transition-colors {{ $comment->isDislikedBy(auth()->user()) ? 'text-red-400' : 'text-zinc-400 hover:text-red-400' }}">
+                                    class="flex items-center space-x-1 text-sm transition-all duration-200 hover:scale-110 {{ $comment->isDislikedBy(auth()->user()) ? 'text-red-400' : 'text-zinc-400 hover:text-red-400' }}"
+                                    data-comment-id="{{ $comment->id }}"
+                                    data-action="dislike">
                                 <span>👎</span>
-                                <span id="comment-dislikes-{{ $comment->id }}">{{ $comment->dislikes_count }}</span>
+                                <span class="dislike-count" data-count="{{ $comment->dislikes_count }}">{{ $comment->dislikes_count }}</span>
                             </button>
                         </div>
                         

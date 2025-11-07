@@ -126,14 +126,18 @@
                                 @auth
                                     <div class="flex items-center space-x-2">
                                         <button onclick="togglePostLike({{ $post->id }}, true)" 
-                                                class="flex items-center space-x-1 text-sm transition-colors {{ $post->isLikedBy(auth()->user()) ? 'text-green-400' : 'text-zinc-400 hover:text-green-400' }}">
+                                                class="flex items-center space-x-1 text-sm transition-all duration-200 hover:scale-110 {{ $post->isLikedBy(auth()->user()) ? 'text-green-400' : 'text-zinc-400 hover:text-green-400' }}"
+                                                data-post-id="{{ $post->id }}"
+                                                data-action="like">
                                             <span>👍</span>
-                                            <span id="post-likes-{{ $post->id }}">{{ $post->likes_count }}</span>
+                                            <span class="like-count" data-count="{{ $post->likes_count }}">{{ $post->likes_count }}</span>
                                         </button>
                                         <button onclick="togglePostLike({{ $post->id }}, false)" 
-                                                class="flex items-center space-x-1 text-sm transition-colors {{ $post->isDislikedBy(auth()->user()) ? 'text-red-400' : 'text-zinc-400 hover:text-red-400' }}">
+                                                class="flex items-center space-x-1 text-sm transition-all duration-200 hover:scale-110 {{ $post->isDislikedBy(auth()->user()) ? 'text-red-400' : 'text-zinc-400 hover:text-red-400' }}"
+                                                data-post-id="{{ $post->id }}"
+                                                data-action="dislike">
                                             <span>👎</span>
-                                            <span id="post-dislikes-{{ $post->id }}">{{ $post->dislikes_count }}</span>
+                                            <span class="dislike-count" data-count="{{ $post->dislikes_count }}">{{ $post->dislikes_count }}</span>
                                         </button>
                                     </div>
                                 @else
@@ -189,42 +193,184 @@
 
     @auth
         <script>
+            // Prevent multiple concurrent requests
+            const activeRequests = new Set();
+
             function togglePostLike(postId, isLike) {
+                const requestKey = `post-${postId}`;
+                
+                // Prevent multiple requests for the same post
+                if (activeRequests.has(requestKey)) {
+                    return;
+                }
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    return;
+                }
+
+                // Get current elements with more specific selectors
+                const likeBtn = document.querySelector(`[data-post-id="${postId}"][data-action="like"]`);
+                const dislikeBtn = document.querySelector(`[data-post-id="${postId}"][data-action="dislike"]`);
+                const likesCountEl = likeBtn ? likeBtn.querySelector('.like-count') : null;
+                const dislikesCountEl = dislikeBtn ? dislikeBtn.querySelector('.dislike-count') : null;
+
+                if (!likeBtn || !dislikeBtn || !likesCountEl || !dislikesCountEl) {
+                    console.error('Required elements not found for post', postId);
+                    console.log('Found elements:', { likeBtn, dislikeBtn, likesCountEl, dislikesCountEl });
+                    return;
+                }
+
+                // Store original values for rollback
+                const originalLikesCount = parseInt(likesCountEl.textContent);
+                const originalDislikesCount = parseInt(dislikesCountEl.textContent);
+                const originalLikeClass = likeBtn.className;
+                const originalDislikeClass = dislikeBtn.className;
+
+                // Determine current state
+                const currentlyLiked = likeBtn.className.includes('text-green-400');
+                const currentlyDisliked = dislikeBtn.className.includes('text-red-400');
+
+                // Calculate optimistic updates
+                let newLikesCount = originalLikesCount;
+                let newDislikesCount = originalDislikesCount;
+                let newLikeClass = originalLikeClass;
+                let newDislikeClass = originalDislikeClass;
+
+                if (isLike) {
+                    if (currentlyLiked) {
+                        // Remove like
+                        newLikesCount = Math.max(0, originalLikesCount - 1);
+                        newLikeClass = originalLikeClass.replace('text-green-400', 'text-zinc-400 hover:text-green-400');
+                    } else {
+                        // Add like
+                        newLikesCount = originalLikesCount + 1;
+                        newLikeClass = originalLikeClass.replace(/text-zinc-400 hover:text-green-400|text-zinc-400/, 'text-green-400');
+                        
+                        // Remove dislike if exists
+                        if (currentlyDisliked) {
+                            newDislikesCount = Math.max(0, originalDislikesCount - 1);
+                            newDislikeClass = originalDislikeClass.replace('text-red-400', 'text-zinc-400 hover:text-red-400');
+                        }
+                    }
+                } else {
+                    if (currentlyDisliked) {
+                        // Remove dislike
+                        newDislikesCount = Math.max(0, originalDislikesCount - 1);
+                        newDislikeClass = originalDislikeClass.replace('text-red-400', 'text-zinc-400 hover:text-red-400');
+                    } else {
+                        // Add dislike
+                        newDislikesCount = originalDislikesCount + 1;
+                        newDislikeClass = originalDislikeClass.replace(/text-zinc-400 hover:text-red-400|text-zinc-400/, 'text-red-400');
+                        
+                        // Remove like if exists
+                        if (currentlyLiked) {
+                            newLikesCount = Math.max(0, originalLikesCount - 1);
+                            newLikeClass = originalLikeClass.replace('text-green-400', 'text-zinc-400 hover:text-green-400');
+                        }
+                    }
+                }
+
+                // Apply optimistic updates immediately
+                likesCountEl.textContent = newLikesCount;
+                dislikesCountEl.textContent = newDislikesCount;
+                likeBtn.className = newLikeClass;
+                dislikeBtn.className = newDislikeClass;
+
+                // Add loading state with visual feedback
+                likeBtn.style.opacity = '0.6';
+                dislikeBtn.style.opacity = '0.6';
+                likeBtn.style.pointerEvents = 'none';
+                dislikeBtn.style.pointerEvents = 'none';
+                
+                // Add subtle loading animation
+                likeBtn.style.transform = 'scale(0.95)';
+                dislikeBtn.style.transform = 'scale(0.95)';
+                
+                // Add loading spinner to the clicked button
+                const clickedBtn = isLike ? likeBtn : dislikeBtn;
+                const originalContent = clickedBtn.innerHTML;
+                const countEl = isLike ? likesCountEl : dislikesCountEl;
+                const emoji = isLike ? '👍' : '👎';
+                clickedBtn.innerHTML = `<span class="animate-spin">⟳</span><span class="opacity-50">${countEl.textContent}</span>`;
+
+                // Track active request
+                activeRequests.add(requestKey);
+
+                // Make the actual request
                 fetch(`/blog/posts/${postId}/like`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({
                         is_like: isLike
                     })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        document.getElementById(`post-likes-${postId}`).textContent = data.likes_count;
-                        document.getElementById(`post-dislikes-${postId}`).textContent = data.dislikes_count;
+                        // Update with server response (in case of discrepancies)
+                        likesCountEl.textContent = data.likes_count;
+                        dislikesCountEl.textContent = data.dislikes_count;
                         
-                        // Update button styles
-                        const likeBtn = document.querySelector(`button[onclick="togglePostLike(${postId}, true)"]`);
-                        const dislikeBtn = document.querySelector(`button[onclick="togglePostLike(${postId}, false)"]`);
-                        
-                        // Reset styles
+                        // Update button styles based on server response
                         likeBtn.className = likeBtn.className.replace(/text-green-400/, 'text-zinc-400 hover:text-green-400');
                         dislikeBtn.className = dislikeBtn.className.replace(/text-red-400/, 'text-zinc-400 hover:text-red-400');
                         
-                        // Apply active styles
                         if (data.user_liked) {
                             likeBtn.className = likeBtn.className.replace(/text-zinc-400 hover:text-green-400/, 'text-green-400');
                         }
                         if (data.user_disliked) {
                             dislikeBtn.className = dislikeBtn.className.replace(/text-zinc-400 hover:text-red-400/, 'text-red-400');
                         }
+                    } else {
+                        throw new Error(data.message || 'Unknown error occurred');
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    
+                    // Rollback optimistic updates on error
+                    likesCountEl.textContent = originalLikesCount;
+                    dislikesCountEl.textContent = originalDislikesCount;
+                    likeBtn.className = originalLikeClass;
+                    dislikeBtn.className = originalDislikeClass;
+                    
+                    // Show user-friendly error message
+                    const errorMsg = document.createElement('div');
+                    errorMsg.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                    errorMsg.textContent = 'Failed to update like. Please try again.';
+                    document.body.appendChild(errorMsg);
+                    
+                    setTimeout(() => {
+                        errorMsg.remove();
+                    }, 3000);
+                })
+                .finally(() => {
+                    // Remove loading state
+                    likeBtn.style.opacity = '1';
+                    dislikeBtn.style.opacity = '1';
+                    likeBtn.style.pointerEvents = 'auto';
+                    dislikeBtn.style.pointerEvents = 'auto';
+                    likeBtn.style.transform = 'scale(1)';
+                    dislikeBtn.style.transform = 'scale(1)';
+                    
+                    // Restore original button content
+                    likeBtn.innerHTML = `<span>👍</span><span class="like-count" data-count="${likesCountEl.textContent}">${likesCountEl.textContent}</span>`;
+                    dislikeBtn.innerHTML = `<span>👎</span><span class="dislike-count" data-count="${dislikesCountEl.textContent}">${dislikesCountEl.textContent}</span>`;
+                    
+                    // Remove from active requests
+                    activeRequests.delete(requestKey);
+                });
             }
         </script>
     @endauth

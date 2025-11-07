@@ -80,14 +80,18 @@
                     @auth
                         <div class="flex items-center space-x-2">
                             <button onclick="togglePostLike({{ $post->id }}, true)" 
-                                    class="flex items-center space-x-1 transition-colors {{ $post->isLikedBy(auth()->user()) ? 'text-green-400' : 'text-zinc-400 hover:text-green-400' }}">
+                                    class="flex items-center space-x-1 transition-all duration-200 hover:scale-110 {{ $post->isLikedBy(auth()->user()) ? 'text-green-400' : 'text-zinc-400 hover:text-green-400' }}"
+                                    data-post-id="{{ $post->id }}"
+                                    data-action="like">
                                 <span>👍</span>
-                                <span id="post-likes-{{ $post->id }}">{{ $post->likes_count }}</span>
+                                <span class="like-count" data-count="{{ $post->likes_count }}">{{ $post->likes_count }}</span>
                             </button>
                             <button onclick="togglePostLike({{ $post->id }}, false)" 
-                                    class="flex items-center space-x-1 transition-colors {{ $post->isDislikedBy(auth()->user()) ? 'text-red-400' : 'text-zinc-400 hover:text-red-400' }}">
+                                    class="flex items-center space-x-1 transition-all duration-200 hover:scale-110 {{ $post->isDislikedBy(auth()->user()) ? 'text-red-400' : 'text-zinc-400 hover:text-red-400' }}"
+                                    data-post-id="{{ $post->id }}"
+                                    data-action="dislike">
                                 <span>👎</span>
-                                <span id="post-dislikes-{{ $post->id }}">{{ $post->dislikes_count }}</span>
+                                <span class="dislike-count" data-count="{{ $post->dislikes_count }}">{{ $post->dislikes_count }}</span>
                             </button>
                         </div>
                     @else
@@ -166,80 +170,261 @@
 
     @auth
         <script>
+            // Prevent multiple concurrent requests
+            const activeRequests = new Set();
+
             function togglePostLike(postId, isLike) {
+                const requestKey = `post-${postId}`;
+                
+                if (activeRequests.has(requestKey)) return;
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    return;
+                }
+
+                const likeBtn = document.querySelector(`[data-post-id="${postId}"][data-action="like"]`);
+                const dislikeBtn = document.querySelector(`[data-post-id="${postId}"][data-action="dislike"]`);
+                const likesCountEl = likeBtn ? likeBtn.querySelector('.like-count') : null;
+                const dislikesCountEl = dislikeBtn ? dislikeBtn.querySelector('.dislike-count') : null;
+
+                if (!likeBtn || !dislikeBtn || !likesCountEl || !dislikesCountEl) {
+                    console.error('Required elements not found for post', postId);
+                    return;
+                }
+
+                // Store original values for rollback
+                const originalLikesCount = parseInt(likesCountEl.textContent);
+                const originalDislikesCount = parseInt(dislikesCountEl.textContent);
+                const originalLikeClass = likeBtn.className;
+                const originalDislikeClass = dislikeBtn.className;
+
+                // Determine current state and calculate optimistic updates
+                const currentlyLiked = likeBtn.className.includes('text-green-400');
+                const currentlyDisliked = dislikeBtn.className.includes('text-red-400');
+
+                let newLikesCount = originalLikesCount;
+                let newDislikesCount = originalDislikesCount;
+                let newLikeClass = originalLikeClass;
+                let newDislikeClass = originalDislikeClass;
+
+                if (isLike) {
+                    if (currentlyLiked) {
+                        newLikesCount = Math.max(0, originalLikesCount - 1);
+                        newLikeClass = originalLikeClass.replace('text-green-400', 'text-zinc-400 hover:text-green-400');
+                    } else {
+                        newLikesCount = originalLikesCount + 1;
+                        newLikeClass = originalLikeClass.replace(/text-zinc-400 hover:text-green-400|text-zinc-400/, 'text-green-400');
+                        if (currentlyDisliked) {
+                            newDislikesCount = Math.max(0, originalDislikesCount - 1);
+                            newDislikeClass = originalDislikeClass.replace('text-red-400', 'text-zinc-400 hover:text-red-400');
+                        }
+                    }
+                } else {
+                    if (currentlyDisliked) {
+                        newDislikesCount = Math.max(0, originalDislikesCount - 1);
+                        newDislikeClass = originalDislikeClass.replace('text-red-400', 'text-zinc-400 hover:text-red-400');
+                    } else {
+                        newDislikesCount = originalDislikesCount + 1;
+                        newDislikeClass = originalDislikeClass.replace(/text-zinc-400 hover:text-red-400|text-zinc-400/, 'text-red-400');
+                        if (currentlyLiked) {
+                            newLikesCount = Math.max(0, originalLikesCount - 1);
+                            newLikeClass = originalLikeClass.replace('text-green-400', 'text-zinc-400 hover:text-green-400');
+                        }
+                    }
+                }
+
+                // Apply optimistic updates
+                likesCountEl.textContent = newLikesCount;
+                dislikesCountEl.textContent = newDislikesCount;
+                likeBtn.className = newLikeClass;
+                dislikeBtn.className = newDislikeClass;
+
+                // Add loading state
+                likeBtn.style.opacity = '0.6';
+                dislikeBtn.style.opacity = '0.6';
+                likeBtn.style.pointerEvents = 'none';
+                dislikeBtn.style.pointerEvents = 'none';
+
+                activeRequests.add(requestKey);
+
                 fetch(`/blog/posts/${postId}/like`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({
-                        is_like: isLike
-                    })
+                    body: JSON.stringify({ is_like: isLike })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        document.getElementById(`post-likes-${postId}`).textContent = data.likes_count;
-                        document.getElementById(`post-dislikes-${postId}`).textContent = data.dislikes_count;
+                        likesCountEl.textContent = data.likes_count;
+                        dislikesCountEl.textContent = data.dislikes_count;
                         
-                        // Update button styles
-                        const likeBtn = document.querySelector(`button[onclick="togglePostLike(${postId}, true)"]`);
-                        const dislikeBtn = document.querySelector(`button[onclick="togglePostLike(${postId}, false)"]`);
-                        
-                        // Reset styles
                         likeBtn.className = likeBtn.className.replace(/text-green-400/, 'text-zinc-400 hover:text-green-400');
                         dislikeBtn.className = dislikeBtn.className.replace(/text-red-400/, 'text-zinc-400 hover:text-red-400');
                         
-                        // Apply active styles
                         if (data.user_liked) {
                             likeBtn.className = likeBtn.className.replace(/text-zinc-400 hover:text-green-400/, 'text-green-400');
                         }
                         if (data.user_disliked) {
                             dislikeBtn.className = dislikeBtn.className.replace(/text-zinc-400 hover:text-red-400/, 'text-red-400');
                         }
+                    } else {
+                        throw new Error(data.message || 'Unknown error occurred');
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    
+                    // Rollback on error
+                    likesCountEl.textContent = originalLikesCount;
+                    dislikesCountEl.textContent = originalDislikesCount;
+                    likeBtn.className = originalLikeClass;
+                    dislikeBtn.className = originalDislikeClass;
+                    
+                    showErrorMessage('Failed to update like. Please try again.');
+                })
+                .finally(() => {
+                    likeBtn.style.opacity = '1';
+                    dislikeBtn.style.opacity = '1';
+                    likeBtn.style.pointerEvents = 'auto';
+                    dislikeBtn.style.pointerEvents = 'auto';
+                    activeRequests.delete(requestKey);
+                });
             }
 
             function toggleCommentLike(commentId, isLike) {
+                const requestKey = `comment-${commentId}`;
+                
+                if (activeRequests.has(requestKey)) return;
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    return;
+                }
+
+                const likeBtn = document.querySelector(`[data-comment-id="${commentId}"][data-action="like"]`);
+                const dislikeBtn = document.querySelector(`[data-comment-id="${commentId}"][data-action="dislike"]`);
+                const likesCountEl = likeBtn ? likeBtn.querySelector('.like-count') : null;
+                const dislikesCountEl = dislikeBtn ? dislikeBtn.querySelector('.dislike-count') : null;
+
+                if (!likeBtn || !dislikeBtn || !likesCountEl || !dislikesCountEl) {
+                    console.error('Required elements not found for comment', commentId);
+                    return;
+                }
+
+                // Store original values
+                const originalLikesCount = parseInt(likesCountEl.textContent);
+                const originalDislikesCount = parseInt(dislikesCountEl.textContent);
+                const originalLikeClass = likeBtn.className;
+                const originalDislikeClass = dislikeBtn.className;
+
+                // Calculate optimistic updates (same logic as post likes)
+                const currentlyLiked = likeBtn.className.includes('text-green-400');
+                const currentlyDisliked = dislikeBtn.className.includes('text-red-400');
+
+                let newLikesCount = originalLikesCount;
+                let newDislikesCount = originalDislikesCount;
+                let newLikeClass = originalLikeClass;
+                let newDislikeClass = originalDislikeClass;
+
+                if (isLike) {
+                    if (currentlyLiked) {
+                        newLikesCount = Math.max(0, originalLikesCount - 1);
+                        newLikeClass = originalLikeClass.replace('text-green-400', 'text-zinc-400 hover:text-green-400');
+                    } else {
+                        newLikesCount = originalLikesCount + 1;
+                        newLikeClass = originalLikeClass.replace(/text-zinc-400 hover:text-green-400|text-zinc-400/, 'text-green-400');
+                        if (currentlyDisliked) {
+                            newDislikesCount = Math.max(0, originalDislikesCount - 1);
+                            newDislikeClass = originalDislikeClass.replace('text-red-400', 'text-zinc-400 hover:text-red-400');
+                        }
+                    }
+                } else {
+                    if (currentlyDisliked) {
+                        newDislikesCount = Math.max(0, originalDislikesCount - 1);
+                        newDislikeClass = originalDislikeClass.replace('text-red-400', 'text-zinc-400 hover:text-red-400');
+                    } else {
+                        newDislikesCount = originalDislikesCount + 1;
+                        newDislikeClass = originalDislikeClass.replace(/text-zinc-400 hover:text-red-400|text-zinc-400/, 'text-red-400');
+                        if (currentlyLiked) {
+                            newLikesCount = Math.max(0, originalLikesCount - 1);
+                            newLikeClass = originalLikeClass.replace('text-green-400', 'text-zinc-400 hover:text-green-400');
+                        }
+                    }
+                }
+
+                // Apply optimistic updates
+                likesCountEl.textContent = newLikesCount;
+                dislikesCountEl.textContent = newDislikesCount;
+                likeBtn.className = newLikeClass;
+                dislikeBtn.className = newDislikeClass;
+
+                // Add loading state
+                likeBtn.style.opacity = '0.6';
+                dislikeBtn.style.opacity = '0.6';
+                likeBtn.style.pointerEvents = 'none';
+                dislikeBtn.style.pointerEvents = 'none';
+
+                activeRequests.add(requestKey);
+
                 fetch(`/blog/comments/${commentId}/like`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({
-                        is_like: isLike
-                    })
+                    body: JSON.stringify({ is_like: isLike })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
-                        document.getElementById(`comment-likes-${commentId}`).textContent = data.likes_count;
-                        document.getElementById(`comment-dislikes-${commentId}`).textContent = data.dislikes_count;
+                        likesCountEl.textContent = data.likes_count;
+                        dislikesCountEl.textContent = data.dislikes_count;
                         
-                        // Update button styles
-                        const likeBtn = document.querySelector(`button[onclick="toggleCommentLike(${commentId}, true)"]`);
-                        const dislikeBtn = document.querySelector(`button[onclick="toggleCommentLike(${commentId}, false)"]`);
-                        
-                        // Reset styles
                         likeBtn.className = likeBtn.className.replace(/text-green-400/, 'text-zinc-400 hover:text-green-400');
                         dislikeBtn.className = dislikeBtn.className.replace(/text-red-400/, 'text-zinc-400 hover:text-red-400');
                         
-                        // Apply active styles
                         if (data.user_liked) {
                             likeBtn.className = likeBtn.className.replace(/text-zinc-400 hover:text-green-400/, 'text-green-400');
                         }
                         if (data.user_disliked) {
                             dislikeBtn.className = dislikeBtn.className.replace(/text-zinc-400 hover:text-red-400/, 'text-red-400');
                         }
+                    } else {
+                        throw new Error(data.message || 'Unknown error occurred');
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    
+                    // Rollback on error
+                    likesCountEl.textContent = originalLikesCount;
+                    dislikesCountEl.textContent = originalDislikesCount;
+                    likeBtn.className = originalLikeClass;
+                    dislikeBtn.className = originalDislikeClass;
+                    
+                    showErrorMessage('Failed to update comment like. Please try again.');
+                })
+                .finally(() => {
+                    likeBtn.style.opacity = '1';
+                    dislikeBtn.style.opacity = '1';
+                    likeBtn.style.pointerEvents = 'auto';
+                    dislikeBtn.style.pointerEvents = 'auto';
+                    activeRequests.delete(requestKey);
+                });
             }
 
             function toggleReplyForm(commentId) {
@@ -249,6 +434,17 @@
                 } else {
                     form.style.display = 'none';
                 }
+            }
+
+            function showErrorMessage(message) {
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'fixed top-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse';
+                errorMsg.textContent = message;
+                document.body.appendChild(errorMsg);
+                
+                setTimeout(() => {
+                    errorMsg.remove();
+                }, 3000);
             }
         </script>
     @endauth
