@@ -85,4 +85,34 @@ class User extends Authenticatable
     {
         return $this->hasMany(CommentLike::class);
     }
+
+    public function subscribedCommunities()
+    {
+        return $this->belongsToMany(Community::class, 'community_subscriptions')
+            ->withPivot(['email_notifications', 'push_notifications', 'is_moderator', 'subscribed_at'])
+            ->withTimestamps();
+    }
+
+    public function moderatedCommunities()
+    {
+        return $this->belongsToMany(Community::class, 'community_subscriptions')
+            ->wherePivot('is_moderator', true)
+            ->withPivot(['email_notifications', 'push_notifications', 'subscribed_at'])
+            ->withTimestamps();
+    }
+
+    public function communitySubscriptions()
+    {
+        return $this->hasMany(CommunitySubscription::class);
+    }
+
+    public function isSubscribedTo(Community $community): bool
+    {
+        return $this->subscribedCommunities()->where('community_id', $community->id)->exists();
+    }
+
+    public function isModeratorOf(Community $community): bool
+    {
+        return $this->moderatedCommunities()->where('community_id', $community->id)->exists();
+    }
 }

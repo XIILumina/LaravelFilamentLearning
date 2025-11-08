@@ -65,7 +65,18 @@ Route::middleware(['auth'])->group(function () {
     });
     
     Route::get('/blog/{post}', [BlogController::class, 'show'])->name('blog.show');
-    Route::get('/community', [CommunityController::class, 'index'])->name('community.index');
+    
+    // Communities routes
+    Route::get('/communities', [CommunityController::class, 'index'])->name('communities.index');
+    Route::get('/community/{community}', [CommunityController::class, 'show'])->name('communities.show');
+    Route::get('/community/{community}/{post}', [CommunityController::class, 'showPost'])->name('communities.post');
+    
+    // Community subscription routes (auth required)
+    Route::middleware(['auth'])->group(function () {
+        Route::post('/community/{community}/subscribe', [CommunityController::class, 'subscribe'])->name('communities.subscribe');
+        Route::delete('/community/{community}/unsubscribe', [CommunityController::class, 'unsubscribe'])->name('communities.unsubscribe');
+        Route::patch('/community/{community}/notifications', [CommunityController::class, 'updateNotifications'])->name('communities.notifications');
+    });
 
     Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
     Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');

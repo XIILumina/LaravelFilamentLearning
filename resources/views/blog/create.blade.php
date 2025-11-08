@@ -57,6 +57,29 @@
                     @enderror
                 </div>
 
+                <!-- Community -->
+                <div>
+                    <label for="community_id" class="block text-sm font-medium text-zinc-300 mb-2">
+                        Community (Optional)
+                    </label>
+                    <select name="community_id" 
+                            id="community_id"
+                            class="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500">
+                        <option value="">Select a community (optional)</option>
+                        @foreach($communities as $community)
+                            <option value="{{ $community->id }}" {{ old('community_id', request('community')) == $community->id ? 'selected' : '' }}>
+                                {{ $community->name }} ({{ $community->hashtag }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="text-zinc-400 text-sm mt-1">
+                        Post to a specific community to reach targeted audience and get better engagement.
+                    </p>
+                    @error('community_id')
+                        <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Photo Upload -->
                 <div>
                     <label for="photo" class="block text-sm font-medium text-zinc-300 mb-2">

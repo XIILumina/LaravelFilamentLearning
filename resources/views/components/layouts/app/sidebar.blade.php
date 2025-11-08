@@ -21,7 +21,7 @@
                 
                 <flux:navlist.group :heading="__('Community')" class="grid">
                     <flux:navlist.item icon="chat-bubble-left-ellipsis" :href="route('blog.index')" :current="request()->routeIs('blog.*')" wire:navigate>{{ __('Blog') }}</flux:navlist.item>
-                    <flux:navlist.item icon="user-group" :href="route('community.index')" :current="request()->routeIs('community.*')" wire:navigate>{{ __('Community') }}</flux:navlist.item>
+                    <flux:navlist.item icon="user-group" :href="route('communities.index')" :current="request()->routeIs('communities.*')" wire:navigate>{{ __('Communities') }}</flux:navlist.item>
                     <flux:navlist.item icon="envelope" :href="route('contact.index')" :current="request()->routeIs('contact.*')" wire:navigate>{{ __('Contact') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>

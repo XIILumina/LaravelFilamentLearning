@@ -35,11 +35,22 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="md:w-48">
+                    <select name="community" 
+                            class="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-indigo-500">
+                        <option value="">All Communities</option>
+                        @foreach($communities as $community)
+                            <option value="{{ $community->id }}" {{ request('community') == $community->id ? 'selected' : '' }}>
+                                {{ $community->hashtag }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
                 <button type="submit" 
                         class="bg-indigo-600 hover:bg-indigo-700 px-6 py-2 rounded-lg text-white transition-colors">
                     Search
                 </button>
-                @if(request('search') || request('game'))
+                @if(request('search') || request('game') || request('community'))
                     <a href="{{ route('blog.index') }}" 
                        class="bg-zinc-600 hover:bg-zinc-700 px-6 py-2 rounded-lg text-white transition-colors">
                         Clear
@@ -73,6 +84,13 @@
                                             <a href="{{ route('games.show', $post->game) }}" 
                                                class="bg-zinc-700 hover:bg-zinc-600 px-2 py-1 rounded text-indigo-400 hover:text-indigo-300 transition-colors">
                                                 🎮 {{ $post->game->title }}
+                                            </a>
+                                        @endif
+                                        @if($post->community)
+                                            <span>•</span>
+                                            <a href="{{ route('communities.show', $post->community) }}" 
+                                               class="bg-indigo-600 hover:bg-indigo-700 px-2 py-1 rounded text-white transition-colors">
+                                                {{ $post->community->hashtag }}
                                             </a>
                                         @endif
                                     </div>

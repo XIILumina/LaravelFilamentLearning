@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Game;
+use App\Models\Community;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,7 +13,7 @@ class BlogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Post::with(['user', 'game', 'comments.user'])
+        $query = Post::with(['user', 'game', 'community', 'comments.user'])
             ->withCount('comments')
             ->orderBy('is_pinned', 'desc')
             ->orderBy('created_at', 'desc');
@@ -31,10 +32,19 @@ class BlogController extends Controller
             $query->where('game_id', $request->get('game'));
         }
 
+        // Filter by community
+        if ($request->filled('community')) {
+            $query->where('community_id', $request->get('community'));
+        }
+
         $posts = $query->paginate(10);
         $games = Game::select('id', 'title')->orderBy('title')->get();
+        $communities = Community::select('id', 'name', 'hashtag')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        return view('blog.index', compact('posts', 'games'));
+        return view('blog.index', compact('posts', 'games', 'communities'));
     }
 
     public function show(Post $post)
@@ -42,6 +52,7 @@ class BlogController extends Controller
         $post->load([
             'user', 
             'game',
+            'community',
             'comments.user',
             'comments.replies.user'
         ]);
@@ -52,7 +63,11 @@ class BlogController extends Controller
     public function create()
     {
         $games = Game::select('id', 'title')->orderBy('title')->get();
-        return view('blog.create', compact('games'));
+        $communities = Community::select('id', 'name', 'hashtag')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+        return view('blog.create', compact('games', 'communities'));
     }
 
     public function store(Request $request)
@@ -61,6 +76,7 @@ class BlogController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'game_id' => 'nullable|exists:games,id',
+            'community_id' => 'nullable|exists:communities,id',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -69,13 +85,19 @@ class BlogController extends Controller
             $photoPath = $request->file('photo')->store('blog-photos', 'public');
         }
 
-        Post::create([
+        $post = Post::create([
             'title' => $request->get('title'),
             'content' => $request->get('content'),
             'game_id' => $request->get('game_id'),
+            'community_id' => $request->get('community_id'),
             'photo' => $photoPath,
             'user_id' => Auth::id()
         ]);
+
+        // Update community post count and last post time
+        if ($post->community) {
+            $post->community->updatePostCount();
+        }
 
         return redirect()->route('blog.index')->with('success', 'Post created successfully!');
     }
@@ -88,7 +110,11 @@ class BlogController extends Controller
         }
         
         $games = Game::select('id', 'title')->orderBy('title')->get();
-        return view('blog.edit', compact('post', 'games'));
+        $communities = Community::select('id', 'name', 'hashtag')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+        return view('blog.edit', compact('post', 'games', 'communities'));
     }
 
     public function update(Request $request, Post $post)
@@ -102,6 +128,7 @@ class BlogController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'game_id' => 'nullable|exists:games,id',
+            'community_id' => 'nullable|exists:communities,id',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
@@ -114,12 +141,25 @@ class BlogController extends Controller
             $photoPath = $request->file('photo')->store('blog-photos', 'public');
         }
 
+        $oldCommunityId = $post->community_id;
+
         $post->update([
             'title' => $request->get('title'),
             'content' => $request->get('content'),
             'game_id' => $request->get('game_id'),
+            'community_id' => $request->get('community_id'),
             'photo' => $photoPath,
         ]);
+
+        // Update post counts for old and new communities
+        if ($oldCommunityId !== $post->community_id) {
+            if ($oldCommunityId) {
+                Community::find($oldCommunityId)?->updatePostCount();
+            }
+            if ($post->community) {
+                $post->community->updatePostCount();
+            }
+        }
 
         return redirect()->route('blog.show', $post)->with('success', 'Post updated successfully!');
     }

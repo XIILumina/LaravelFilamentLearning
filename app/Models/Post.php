@@ -17,6 +17,7 @@ class Post extends Model
         'photo',
         'user_id',
         'game_id',
+        'community_id',
         'likes_count',
         'dislikes_count',
         'comments_count',
@@ -37,6 +38,11 @@ class Post extends Model
     public function game(): BelongsTo
     {
         return $this->belongsTo(Game::class);
+    }
+
+    public function community(): BelongsTo
+    {
+        return $this->belongsTo(Community::class);
     }
 
     public function comments(): HasMany
