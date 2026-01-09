@@ -11,7 +11,7 @@
                 {{ session('info') }}
             </div>
         @endif
-        
+          -0
         <h1 class="text-5xl font-extrabold text-center text-indigo-400 mb-12 tracking-wide drop-shadow-lg">
             🎮 Game Database
         </h1>
@@ -32,7 +32,7 @@
 
                     <div class="p-5">
                         <h2 class="text-2xl font-semibold text-indigo-300 mb-3">{{ $game->title }}</h2>
-
+-6
                         <p class="text-zinc-400 text-sm mb-1"> Developer: 
                             <span class="text-zinc-300">{{ $game->developer->name ?? 'Unknown' }}</span>
                         </p>

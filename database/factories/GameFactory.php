@@ -14,13 +14,17 @@ class GameFactory extends Factory
 
     public function definition(): array
     {
+        // Use a placeholder image from a public service
+        $placeholderId = $this->faker->numberBetween(1, 100);
+        $placeholderUrl = "https://picsum.photos/400/600?random=$placeholderId";
+        
         return [
             'title' => $this->faker->unique()->sentence(3),
             'description' => $this->faker->paragraph,
             'release_date' => $this->faker->date(),
             'publisher' => $this->faker->company,
             'rating' => $this->faker->randomFloat(1, 0, 10),
-            'image_url' => 'games/' . $this->faker->numberBetween(1, 10) . '.png', // placeholder
+            'image_url' => $placeholderUrl, // using external placeholder service
             'featured' => $this->faker->boolean(20), // 20% chance featured
         ];
     }

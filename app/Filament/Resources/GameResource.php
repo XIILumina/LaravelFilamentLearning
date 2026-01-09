@@ -135,7 +135,8 @@ class GameResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            \App\Filament\Resources\GameResource\RelationManagers\AttributesRelationManager::class,
+            \App\Filament\Resources\GameResource\RelationManagers\SkusRelationManager::class,
         ];
     }
 

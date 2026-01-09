@@ -83,6 +83,8 @@ class CommunitySeeder extends Seeder
 
         foreach ($communityData as $index => $data) {
             if (isset($games[$index])) {
+                // Generate consistent placeholder images for each community based on index
+                $placeholderId = $index + 1;
                 Community::create([
                     'name' => $data['name'],
                     'description' => $data['description'],
@@ -93,6 +95,8 @@ class CommunitySeeder extends Seeder
                     'subscriber_count' => rand(50, 500),
                     'post_count' => rand(10, 100),
                     'last_post_at' => now()->subDays(rand(0, 30)),
+                    'banner_image' => "https://picsum.photos/1200/300?random=$placeholderId",
+                    'icon_image' => "https://picsum.photos/200/200?random=$placeholderId",
                 ]);
             }
         }

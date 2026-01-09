@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->foreignId('community_id')->nullable()->constrained('communities')->onDelete('set null');
-            $table->index(['community_id', 'created_at']);
+            $table->foreignId('community_id')->nullable()->constrained()->onDelete('set null');
         });
     }
 
@@ -23,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('posts', function (Blueprint $table) {
-            $table->dropForeign(['community_id']);
+            $table->dropForeignKey(['community_id']);
             $table->dropColumn('community_id');
         });
     }

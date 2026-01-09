@@ -52,6 +52,17 @@ class Game extends Model
     {
         return $this->belongsToMany(User::class, 'wishlists');
     }
+
+    // PIM Relationships
+    public function attributes()
+    {
+        return $this->hasMany(GameAttribute::class);
+    }
+
+    public function skus()
+    {
+        return $this->hasMany(GameProductSku::class);
+    }
     
     public function isWishlistedBy($user = null)
     {
