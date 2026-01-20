@@ -17,7 +17,9 @@ class GenreResource extends Resource
 {
     protected static ?string $model = Genre::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $navigationGroup = 'Games & Catalog';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {

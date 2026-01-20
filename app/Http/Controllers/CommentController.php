@@ -4,17 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Post;
+use App\Services\TextFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
+    protected TextFilterService $filterService;
+
+    public function __construct(TextFilterService $filterService)
+    {
+        $this->filterService = $filterService;
+    }
     public function store(Request $request, Post $post)
     {
         $request->validate([
             'content' => 'required|string|max:1000',
             'parent_id' => 'nullable|exists:comments,id'
         ]);
+
+        // Check for inappropriate content
+        if ($this->filterService->containsInappropriateContent($request->get('content'))) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your comment contains inappropriate language. Please revise and try again.'
+                ], 422);
+            }
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Your comment contains inappropriate language. Please revise and try again.');
+        }
 
         $comment = Comment::create([
             'content' => $request->get('content'),
@@ -47,6 +67,19 @@ class CommentController extends Controller
         $request->validate([
             'content' => 'required|string|max:1000'
         ]);
+
+        // Check for inappropriate content
+        if ($this->filterService->containsInappropriateContent($request->get('content'))) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your comment contains inappropriate language. Please revise and try again.'
+                ], 422);
+            }
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Your comment contains inappropriate language. Please revise and try again.');
+        }
 
         $comment->update([
             'content' => $request->get('content')

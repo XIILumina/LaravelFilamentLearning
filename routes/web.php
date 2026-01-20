@@ -14,6 +14,10 @@ use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\CommentLikeController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\ModerationController;
+use App\Http\Controllers\Admin\GameController as AdminGameController;
+use App\Http\Controllers\Admin\AnalyticsController;
 
 
 Route::get('/', function () {
@@ -95,4 +99,23 @@ Route::middleware(['auth'])->group(function () {
             ),
         )
         ->name('two-factor.show');
+});
+
+// Legacy Admin Routes - Now using Filament at /admin
+// These are kept with a different prefix in case needed
+Route::middleware(['auth', 'verified', 'is_admin'])->prefix('legacy-admin')->name('legacy-admin.')->group(function () {
+    Route::get('/users', [AdminUserController::class, 'index'])->name('users');
+    Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::patch('/users/{user}/role', [AdminUserController::class, 'updateRole'])->name('users.update-role');
+    
+    Route::get('/moderation', [ModerationController::class, 'index'])->name('moderation');
+    Route::post('/moderation/posts/{post}/flag', [ModerationController::class, 'flagPost'])->name('posts.flag');
+    Route::delete('/moderation/posts/{post}', [ModerationController::class, 'deletePost'])->name('posts.delete');
+    Route::delete('/moderation/comments/{comment}', [ModerationController::class, 'deleteComment'])->name('comments.delete');
+    
+    Route::get('/games', [AdminGameController::class, 'index'])->name('games');
+    Route::get('/games/{game}/edit', [AdminGameController::class, 'edit'])->name('games.edit');
+    Route::patch('/games/{game}', [AdminGameController::class, 'update'])->name('games.update');
+    
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
 });

@@ -5,12 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Game;
 use App\Models\Community;
+use App\Services\TextFilterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class BlogController extends Controller
 {
+    protected TextFilterService $filterService;
+
+    public function __construct(TextFilterService $filterService)
+    {
+        $this->filterService = $filterService;
+    }
     public function index(Request $request)
     {
         $query = Post::with(['user', 'game', 'community', 'comments.user'])
@@ -80,6 +87,14 @@ class BlogController extends Controller
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
+        // Check for inappropriate content
+        if ($this->filterService->containsInappropriateContent($request->get('title')) || 
+            $this->filterService->containsInappropriateContent($request->get('content'))) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Your post contains inappropriate language. Please revise and try again.');
+        }
+
         $photoPath = null;
         if ($request->hasFile('photo')) {
             $photoPath = $request->file('photo')->store('blog-photos', 'public');
@@ -131,6 +146,14 @@ class BlogController extends Controller
             'community_id' => 'nullable|exists:communities,id',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+
+        // Check for inappropriate content
+        if ($this->filterService->containsInappropriateContent($request->get('title')) || 
+            $this->filterService->containsInappropriateContent($request->get('content'))) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Your post contains inappropriate language. Please revise and try again.');
+        }
 
         $photoPath = $post->photo;
         if ($request->hasFile('photo')) {

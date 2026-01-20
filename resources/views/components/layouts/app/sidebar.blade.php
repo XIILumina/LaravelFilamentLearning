@@ -3,27 +3,80 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-            <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
+    <body class="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+        <flux:sidebar sticky stashable class="border-e border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900">
+            <flux:sidebar.toggle class="lg:hidden text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
+            <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse py-3 px-2 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors" wire:navigate>
                 <x-app-logo />
             </a>
 
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Navigation')" class="grid">
-                    <flux:navlist.item icon="squares-2x2" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                    <flux:navlist.item icon="puzzle-piece" :href="route('games.index')" :current="request()->routeIs('games.*')" wire:navigate>{{ __('Games') }}</flux:navlist.item>
-                    <flux:navlist.item icon="tag" :href="route('genres.index')" :current="request()->routeIs('genres.*')" wire:navigate>{{ __('Genres') }}</flux:navlist.item>
-                    <flux:navlist.item icon="heart" :href="route('wishlist.index')" :current="request()->routeIs('wishlist.*')" wire:navigate>{{ __('My Wishlist') }}</flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="squares-2x2" 
+                        :href="route('dashboard')" 
+                        :current="request()->routeIs('dashboard')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="puzzle-piece" 
+                        :href="route('games.index')" 
+                        :current="request()->routeIs('games.*')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('Games') }}</flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="tag" 
+                        :href="route('genres.index')" 
+                        :current="request()->routeIs('genres.*')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('Genres') }}</flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="heart" 
+                        :href="route('wishlist.index')" 
+                        :current="request()->routeIs('wishlist.*')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('My Wishlist') }}</flux:navlist.item>
                 </flux:navlist.group>
                 
                 <flux:navlist.group :heading="__('Community')" class="grid">
-                    <flux:navlist.item icon="chat-bubble-left-ellipsis" :href="route('blog.index')" :current="request()->routeIs('blog.*')" wire:navigate>{{ __('Blog') }}</flux:navlist.item>
-                    <flux:navlist.item icon="user-group" :href="route('communities.index')" :current="request()->routeIs('communities.*')" wire:navigate>{{ __('Communities') }}</flux:navlist.item>
-                    <flux:navlist.item icon="envelope" :href="route('contact.index')" :current="request()->routeIs('contact.*')" wire:navigate>{{ __('Contact') }}</flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="chat-bubble-left-ellipsis" 
+                        :href="route('blog.index')" 
+                        :current="request()->routeIs('blog.*')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('Blog') }}</flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="user-group" 
+                        :href="route('communities.index')" 
+                        :current="request()->routeIs('communities.*')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('Communities') }}</flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="envelope" 
+                        :href="route('contact.index')" 
+                        :current="request()->routeIs('contact.*')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('Contact') }}</flux:navlist.item>
                 </flux:navlist.group>
+
+                @if(auth()->user()->isAdmin())
+                <flux:navlist.group :heading="__('Admin')" class="grid">
+                    <flux:navlist.item 
+                        icon="rectangle-group" 
+                        :href="url('/admin')" 
+                        :current="request()->is('admin*')" 
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('Admin Panel') }}</flux:navlist.item>
+                </flux:navlist.group>
+                @endif
             </flux:navlist>
 
             <flux:spacer />
@@ -35,39 +88,40 @@
                     :initials="auth()->user()->initials()"
                     icon:trailing="chevrons-up-down"
                     data-test="sidebar-menu-button"
+                    class="text-zinc-700 dark:text-zinc-300"
                 />
 
-                <flux:menu class="w-[220px]">
+                <flux:menu class="w-[220px] bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
                     <flux:menu.radio.group>
                         <div class="p-0 text-sm font-normal">
                             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                                 <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                                     <span
-                                        class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
+                                        class="flex h-full w-full items-center justify-center rounded-lg bg-zinc-300 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 font-semibold"
                                     >
                                         {{ auth()->user()->initials() }}
                                     </span>
                                 </span>
 
                                 <div class="grid flex-1 text-start text-sm leading-tight">
-                                    <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                    <span class="truncate text-xs">{{ auth()->user()->email }}</span>
+                                    <span class="truncate font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</span>
+                                    <span class="truncate text-xs text-zinc-600 dark:text-zinc-400">{{ auth()->user()->email }}</span>
                                 </div>
                             </div>
                         </div>
                     </flux:menu.radio.group>
 
-                    <flux:menu.separator />
+                    <flux:menu.separator class="bg-zinc-300 dark:bg-zinc-700" />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate class="text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700">{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 
-                    <flux:menu.separator />
+                    <flux:menu.separator class="bg-zinc-300 dark:bg-zinc-700" />
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
-                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
+                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700" data-test="logout-button">
                             {{ __('Log Out') }}
                         </flux:menu.item>
                     </form>
@@ -76,8 +130,8 @@
         </flux:sidebar>
 
         <!-- Mobile User Menu -->
-        <flux:header class="lg:hidden">
-            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+        <flux:header class="lg:hidden bg-zinc-100 dark:bg-zinc-900 border-b border-zinc-300 dark:border-zinc-700">
+            <flux:sidebar.toggle class="lg:hidden text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200" icon="bars-2" inset="left" />
 
             <flux:spacer />
 
@@ -85,39 +139,40 @@
                 <flux:profile
                     :initials="auth()->user()->initials()"
                     icon-trailing="chevron-down"
+                    class="text-zinc-700 dark:text-zinc-300"
                 />
 
-                <flux:menu>
+                <flux:menu class="bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700">
                     <flux:menu.radio.group>
                         <div class="p-0 text-sm font-normal">
                             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                                 <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                                     <span
-                                        class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
+                                        class="flex h-full w-full items-center justify-center rounded-lg bg-zinc-300 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 font-semibold"
                                     >
                                         {{ auth()->user()->initials() }}
                                     </span>
                                 </span>
 
                                 <div class="grid flex-1 text-start text-sm leading-tight">
-                                    <span class="truncate font-semibold">{{ auth()->user()->name }}</span>
-                                    <span class="truncate text-xs">{{ auth()->user()->email }}</span>
+                                    <span class="truncate font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</span>
+                                    <span class="truncate text-xs text-zinc-600 dark:text-zinc-400">{{ auth()->user()->email }}</span>
                                 </div>
                             </div>
                         </div>
                     </flux:menu.radio.group>
 
-                    <flux:menu.separator />
+                    <flux:menu.separator class="bg-zinc-300 dark:bg-zinc-700" />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate class="text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700">{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 
-                    <flux:menu.separator />
+                    <flux:menu.separator class="bg-zinc-300 dark:bg-zinc-700" />
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
-                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full" data-test="logout-button">
+                        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700" data-test="logout-button">
                             {{ __('Log Out') }}
                         </flux:menu.item>
                     </form>
@@ -126,6 +181,8 @@
         </flux:header>
 
         {{ $slot }}
+
+        <x-prevent-double-submit />
 
         @fluxScripts
     </body>

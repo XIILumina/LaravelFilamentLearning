@@ -1,77 +1,70 @@
 @foreach($comments as $comment)
-    <div class="comment" id="comment-{{ $comment->id }}">
-        <div class="flex items-start space-x-3">
+    <div class="comment p-5 sm:p-6" id="comment-{{ $comment->id }}">
+        <div class="flex gap-3">
             <!-- User Avatar -->
-            <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+            <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">
                 {{ $comment->user->initials() }}
             </div>
             
-            <div class="flex-1">
+            <div class="flex-1 min-w-0">
                 <!-- Comment Header -->
-                <div class="flex items-center space-x-2 mb-2">
-                    <span class="text-zinc-300 font-medium">{{ $comment->user->name }}</span>
-                    <span class="text-zinc-500 text-sm">{{ $comment->created_at->diffForHumans() }}</span>
+                <div class="flex flex-wrap items-center gap-2 text-sm mb-2">
+                    <span class="font-medium text-white">{{ $comment->user->name }}</span>
+                    <span class="text-zinc-500">{{ $comment->created_at->diffForHumans() }}</span>
                     @if($comment->parent)
-                        <span class="text-zinc-500 text-sm">
-                            replying to <span class="text-indigo-400">{{ $comment->parent->user->name }}</span>
+                        <span class="text-zinc-500">
+                            → <span class="text-orange-500">{{ $comment->parent->user->name }}</span>
                         </span>
                     @endif
                 </div>
                 
                 <!-- Comment Content -->
-                <div class="text-zinc-300 mb-3">
-                    {!! nl2br(e($comment->content)) !!}
-                </div>
+                <div class="text-zinc-300 text-sm mb-3 whitespace-pre-line">{{ $comment->content }}</div>
                 
                 <!-- Comment Actions -->
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center gap-4 text-xs">
                     @auth
-                        <!-- Like/Dislike -->
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center gap-1">
                             <button onclick="toggleCommentLike({{ $comment->id }}, true)" 
-                                    class="flex items-center space-x-1 text-sm transition-all duration-200 hover:scale-110 {{ $comment->isLikedBy(auth()->user()) ? 'text-green-400' : 'text-zinc-400 hover:text-green-400' }}"
+                                    class="p-1 transition {{ $comment->isLikedBy(auth()->user()) ? 'text-orange-500' : 'text-zinc-500 hover:text-orange-500' }}"
                                     data-comment-id="{{ $comment->id }}"
                                     data-action="like">
-                                <span>👍</span>
-                                <span class="like-count" data-count="{{ $comment->likes_count }}">{{ $comment->likes_count }}</span>
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 3a1 1 0 01.707.293l7 7a1 1 0 01-1.414 1.414L10 5.414 3.707 11.707a1 1 0 01-1.414-1.414l7-7A1 1 0 0110 3z"/>
+                                </svg>
                             </button>
+                            <span class="like-count text-zinc-400 font-medium">{{ $comment->likes_count }}</span>
                             <button onclick="toggleCommentLike({{ $comment->id }}, false)" 
-                                    class="flex items-center space-x-1 text-sm transition-all duration-200 hover:scale-110 {{ $comment->isDislikedBy(auth()->user()) ? 'text-red-400' : 'text-zinc-400 hover:text-red-400' }}"
+                                    class="p-1 transition {{ $comment->isDislikedBy(auth()->user()) ? 'text-blue-500' : 'text-zinc-500 hover:text-blue-500' }}"
                                     data-comment-id="{{ $comment->id }}"
                                     data-action="dislike">
-                                <span>👎</span>
-                                <span class="dislike-count" data-count="{{ $comment->dislikes_count }}">{{ $comment->dislikes_count }}</span>
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 17a1 1 0 01-.707-.293l-7-7a1 1 0 011.414-1.414L10 14.586l6.293-6.293a1 1 0 011.414 1.414l-7 7A1 1 0 0110 17z"/>
+                                </svg>
                             </button>
+                            <span class="dislike-count text-zinc-400 font-medium">{{ $comment->dislikes_count }}</span>
                         </div>
                         
-                        <!-- Reply Button -->
                         <button onclick="toggleReplyForm({{ $comment->id }})" 
-                                class="text-zinc-400 hover:text-indigo-400 text-sm transition-colors">
+                                class="text-zinc-500 hover:text-white transition">
                             Reply
                         </button>
                         
-                        <!-- Edit/Delete (for comment owner) -->
                         @if($comment->user_id === auth()->id())
                             <form method="POST" action="{{ route('comments.destroy', $comment) }}" class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" 
                                         onclick="return confirm('Delete this comment?')"
-                                        class="text-zinc-400 hover:text-red-400 text-sm transition-colors">
+                                        class="text-zinc-500 hover:text-red-500 transition">
                                     Delete
                                 </button>
                             </form>
                         @endif
                     @else
-                        <div class="flex items-center space-x-2 text-zinc-400 text-sm">
-                            <span class="flex items-center space-x-1">
-                                <span>👍</span>
-                                <span>{{ $comment->likes_count }}</span>
-                            </span>
-                            <span class="flex items-center space-x-1">
-                                <span>👎</span>
-                                <span>{{ $comment->dislikes_count }}</span>
-                            </span>
+                        <div class="flex items-center gap-2 text-zinc-500">
+                            <span>👍 {{ $comment->likes_count }}</span>
+                            <span>👎 {{ $comment->dislikes_count }}</span>
                         </div>
                     @endauth
                 </div>
@@ -82,26 +75,26 @@
                         <form method="POST" action="{{ route('comments.store', $comment->post) }}" class="space-y-3">
                             @csrf
                             <input type="hidden" name="parent_id" value="{{ $comment->id }}">
-                            <div class="flex items-start space-x-3">
-                                <div class="w-6 h-6 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                            <div class="flex gap-2">
+                                <div class="w-6 h-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-[10px] shrink-0">
                                     {{ auth()->user()->initials() }}
                                 </div>
                                 <div class="flex-1">
                                     <textarea name="content" 
                                               rows="2" 
                                               placeholder="Write a reply..." 
-                                              class="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white placeholder-zinc-400 focus:ring-2 focus:ring-indigo-500 resize-none text-sm"
+                                              class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-white placeholder-zinc-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none text-sm"
                                               required></textarea>
                                 </div>
                             </div>
-                            <div class="flex justify-end space-x-2">
+                            <div class="flex justify-end gap-2">
                                 <button type="button" 
                                         onclick="toggleReplyForm({{ $comment->id }})"
-                                        class="bg-zinc-600 hover:bg-zinc-700 px-4 py-1 rounded text-white text-sm transition-colors">
+                                        class="bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded-lg text-white text-xs transition">
                                     Cancel
                                 </button>
                                 <button type="submit" 
-                                        class="bg-indigo-600 hover:bg-indigo-700 px-4 py-1 rounded text-white text-sm transition-colors">
+                                        class="bg-orange-500 hover:bg-orange-600 px-3 py-1.5 rounded-lg text-white text-xs transition">
                                     Reply
                                 </button>
                             </div>
@@ -111,7 +104,7 @@
                 
                 <!-- Replies -->
                 @if($comment->replies->isNotEmpty())
-                    <div class="mt-4 ml-4 space-y-4 border-l-2 border-zinc-700 pl-4">
+                    <div class="mt-4 ml-2 border-l-2 border-zinc-800 pl-4 space-y-0 divide-y divide-zinc-800">
                         @include('blog.partials.comments', ['comments' => $comment->replies])
                     </div>
                 @endif

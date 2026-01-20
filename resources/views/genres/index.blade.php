@@ -1,27 +1,29 @@
-<x-layouts.app title="Browse Games by Genre">
-    <div class="px-6 py-8 max-w-7xl mx-auto">
-        <h1 class="text-4xl font-bold text-indigo-400 mb-8">Browse Games by Genre</h1>
-        
-        <!-- Search and Filter Section -->
-        <div class="bg-zinc-800 rounded-xl p-6 mb-8">
-            <form method="GET" action="{{ route('genres.index') }}" class="flex flex-col md:flex-row gap-4">
-                <!-- Search Input -->
-                <div class="flex-1">
-                    <label for="search" class="block text-sm font-medium text-zinc-300 mb-2">Search Games</label>
-                    <input type="text" 
-                           id="search" 
-                           name="search" 
-                           value="{{ $search }}"
-                           placeholder="Search by title, description, genre, or developer..."
-                           class="w-full px-4 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white placeholder-zinc-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                </div>
-                
-                <!-- Genre Filter -->
-                <div class="md:w-64">
-                    <label for="genre" class="block text-sm font-medium text-zinc-300 mb-2">Filter by Genre</label>
+<x-layouts.app title="Browse by Genre">
+    <div class="min-h-screen bg-zinc-950">
+        <!-- Header -->
+        <div class="px-4 sm:px-6 py-6 border-b border-zinc-800">
+            <div class="max-w-5xl mx-auto">
+                <h1 class="text-2xl sm:text-3xl font-bold text-white">Browse by Genre</h1>
+                <p class="text-zinc-500 text-sm mt-1">Discover games by category</p>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="px-4 sm:px-6 py-4 border-b border-zinc-800 bg-zinc-900/50">
+            <div class="max-w-5xl mx-auto">
+                <form method="GET" action="{{ route('genres.index') }}" class="flex flex-col sm:flex-row gap-3">
+                    <div class="flex-1 relative">
+                        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" 
+                               name="search" 
+                               value="{{ $search }}"
+                               placeholder="Search games..." 
+                               class="w-full bg-zinc-800 border border-zinc-700 rounded-xl pl-10 pr-4 py-2.5 text-white placeholder-zinc-500 focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm">
+                    </div>
                     <select name="genre" 
-                            id="genre"
-                            class="w-full px-4 py-2 bg-zinc-700 border border-zinc-600 rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            class="sm:w-48 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-orange-500">
                         <option value="">All Genres</option>
                         @foreach($genres as $genre)
                             <option value="{{ $genre->id }}" {{ $selectedGenre == $genre->id ? 'selected' : '' }}>
@@ -29,125 +31,115 @@
                             </option>
                         @endforeach
                     </select>
-                </div>
-                
-                <!-- Search Button -->
-                <div class="md:w-auto md:flex md:items-end">
                     <button type="submit" 
-                            class="w-full md:w-auto px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200">
+                            class="bg-orange-500 hover:bg-orange-600 px-5 py-2.5 rounded-xl text-white font-medium text-sm transition">
                         Filter
                     </button>
-                </div>
-                
-                <!-- Clear Button -->
+                </form>
                 @if($search || $selectedGenre)
-                    <div class="md:w-auto md:flex md:items-end">
-                        <a href="{{ route('genres.index') }}" 
-                           class="w-full md:w-auto px-6 py-2 bg-zinc-600 hover:bg-zinc-700 text-white font-medium rounded-lg transition-colors duration-200 text-center block">
-                            Clear
-                        </a>
+                    <div class="mt-3 flex items-center justify-between">
+                        <p class="text-sm text-zinc-500">
+                            {{ $games->total() }} result{{ $games->total() !== 1 ? 's' : '' }}
+                            @if($search) for "{{ $search }}" @endif
+                        </p>
+                        <a href="{{ route('genres.index') }}" class="text-sm text-orange-500 hover:text-orange-400">Clear ×</a>
                     </div>
                 @endif
-            </form>
+            </div>
         </div>
 
-        <!-- Results Summary -->
-        @if($search || $selectedGenre)
-            <div class="mb-6">
-                <p class="text-zinc-400">
-                    Showing {{ $games->total() }} result{{ $games->total() !== 1 ? 's' : '' }}
-                    @if($search)
-                        for "{{ $search }}"
-                    @endif
-                    @if($selectedGenre)
-                        @php $currentGenre = $genres->firstWhere('id', $selectedGenre); @endphp
-                        in {{ $currentGenre->name ?? 'Unknown Genre' }}
-                    @endif
-                </p>
-            </div>
-        @endif
-
         <!-- Games Grid -->
-        @if($games->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                @foreach($games as $game)
-                    <div class="bg-zinc-800 rounded-xl shadow-lg overflow-hidden hover:transform hover:scale-105 transition-all duration-200">
-                        <a href="{{ route('games.show', $game) }}" class="block">
-                            @if($game->image_url)
-                                <img src="{{ asset('storage/' . $game->image_url) }}" 
-                                     alt="{{ $game->title }}" 
-                                     class="w-full h-48 object-cover">
-                            @else
-                                <div class="w-full h-48 bg-zinc-700 flex items-center justify-center text-zinc-400">
-                                    No Image
+        <div class="px-4 sm:px-6 py-6 pb-24 sm:pb-12">
+            <div class="max-w-5xl mx-auto">
+                @if($games->count() > 0)
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                        @foreach($games as $game)
+                            <a href="{{ route('games.show', $game) }}" class="group">
+                                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition">
+                                    <div class="relative aspect-[3/4]">
+                                        @if($game->image_url)
+                                            <img src="{{ asset('storage/' . $game->image_url) }}" 
+                                                 alt="{{ $game->title }}" 
+                                                 class="w-full h-full object-cover group-hover:opacity-90 transition">
+                                        @else
+                                            <div class="w-full h-full bg-zinc-800 flex items-center justify-center">
+                                                <svg class="w-8 h-8 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                                                </svg>
+                                            </div>
+                                        @endif
+                                        @if($game->rating)
+                                            <div class="absolute top-2 left-2 flex items-center gap-1 bg-zinc-900/80 backdrop-blur-sm px-2 py-1 rounded-lg">
+                                                <svg class="w-3 h-3 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                                </svg>
+                                                <span class="text-xs font-semibold text-white">{{ number_format((float)($game->rating ?? 0), 1) }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="p-3">
+                                        <h3 class="font-medium text-white text-sm truncate group-hover:text-orange-500 transition">{{ $game->title }}</h3>
+                                        <p class="text-xs text-zinc-500 truncate">{{ $game->developer->name ?? 'Unknown' }}</p>
+                                    </div>
                                 </div>
-                            @endif
-                            
-                            <div class="p-4">
-                                <h3 class="text-xl font-semibold text-indigo-400 mb-2">{{ $game->title }}</h3>
-                                <p class="text-zinc-400 text-sm mb-2">{{ $game->developer->name ?? 'Unknown Developer' }}</p>
-                                <p class="text-zinc-300 text-sm mb-3 line-clamp-2">{{ Str::limit($game->description, 100) }}</p>
-                                
-                                <div class="flex flex-wrap gap-2 mb-3">
-                                    <span class="bg-indigo-700 px-2 py-1 rounded text-xs">⭐ {{ number_format($game->rating, 1) }}</span>
-                                    @if($game->featured)
-                                        <span class="bg-green-600 px-2 py-1 rounded text-xs">🔥 Featured</span>
-                                    @endif
-                                </div>
-                                
-                                <div class="flex flex-wrap gap-1">
-                                    @foreach($game->genres->take(3) as $genre)
-                                        <span class="bg-zinc-700 px-2 py-1 rounded text-xs">{{ $genre->name }}</span>
-                                    @endforeach
-                                    @if($game->genres->count() > 3)
-                                        <span class="text-zinc-400 text-xs px-2 py-1">+{{ $game->genres->count() - 3 }} more</span>
-                                    @endif
-                                </div>
-                            </div>
-                        </a>
+                            </a>
+                        @endforeach
                     </div>
-                @endforeach
-            </div>
 
-            <!-- Pagination -->
-            <div class="flex justify-center">
-                {{ $games->links() }}
-            </div>
-        @else
-            <!-- No Results -->
-            <div class="text-center py-12">
-                <div class="text-zinc-400 text-6xl mb-4">🎮</div>
-                <h3 class="text-2xl font-semibold text-zinc-300 mb-2">No games found</h3>
-                <p class="text-zinc-400 mb-4">
-                    @if($search || $selectedGenre)
-                        Try adjusting your search criteria or browse all games.
-                    @else
-                        No games available at the moment.
-                    @endif
-                </p>
-                @if($search || $selectedGenre)
-                    <a href="{{ route('genres.index') }}" 
-                       class="inline-block px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors duration-200">
-                        View All Games
-                    </a>
+                    <div class="mt-8">
+                        {{ $games->appends(request()->query())->links() }}
+                    </div>
+                @else
+                    <div class="text-center py-16">
+                        <div class="w-20 h-20 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-10 h-10 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white mb-2">No games found</h3>
+                        <p class="text-zinc-500 text-sm">Try adjusting your search or filters</p>
+                    </div>
                 @endif
             </div>
-        @endif
+        </div>
 
-        <!-- Genre Statistics -->
-        @if(!$search && !$selectedGenre)
-            <div class="mt-12">
-                <h2 class="text-2xl font-bold text-indigo-400 mb-6">Browse by Genre</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    @foreach($genres as $genre)
-                        <a href="{{ route('genres.show', $genre) }}" 
-                           class="bg-zinc-800 rounded-lg p-4 hover:bg-zinc-700 transition-colors duration-200">
-                            <h3 class="text-lg font-semibold text-white mb-1">{{ $genre->name }}</h3>
-                            <p class="text-zinc-400 text-sm">{{ $genre->games_count }} game{{ $genre->games_count !== 1 ? 's' : '' }}</p>
-                        </a>
-                    @endforeach
-                </div>
+        <!-- Mobile Bottom Navigation -->
+        <div class="fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800 sm:hidden z-50">
+            <div class="flex items-center justify-around py-2">
+                <a href="{{ route('home') }}" class="flex flex-col items-center p-2 text-zinc-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span class="text-xs mt-1">Home</span>
+                </a>
+                <a href="{{ route('games.index') }}" class="flex flex-col items-center p-2 text-zinc-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                    </svg>
+                    <span class="text-xs mt-1">Games</span>
+                </a>
+                <a href="{{ route('communities.index') }}" class="flex flex-col items-center p-2 text-zinc-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <span class="text-xs mt-1">Communities</span>
+                </a>
+                @auth
+                    <a href="{{ route('dashboard') }}" class="flex flex-col items-center p-2 text-zinc-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        <span class="text-xs mt-1">Profile</span>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="flex flex-col items-center p-2 text-zinc-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                        </svg>
+                        <span class="text-xs mt-1">Login</span>
+                    </a>
+                @endauth
             </div>
-        @endif
+        </div>
     </div>
 </x-layouts.app>

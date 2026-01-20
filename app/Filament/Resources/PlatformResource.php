@@ -17,7 +17,9 @@ class PlatformResource extends Resource
 {
     protected static ?string $model = Platform::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-computer-desktop';
+    protected static ?string $navigationGroup = 'Games & Catalog';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {

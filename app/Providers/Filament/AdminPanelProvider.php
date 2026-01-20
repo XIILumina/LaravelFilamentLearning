@@ -2,6 +2,20 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\AppObjectResource;
+use App\Filament\Resources\AttributeResource;
+use App\Filament\Resources\AttributeValueResource;
+use App\Filament\Resources\CommentResource;
+use App\Filament\Resources\CommunityResource;
+use App\Filament\Resources\ContactResource;
+use App\Filament\Resources\DeveloperResource;
+use App\Filament\Resources\GameResource;
+use App\Filament\Resources\GenreResource;
+use App\Filament\Resources\PlatformResource;
+use App\Filament\Resources\PostResource;
+use App\Filament\Resources\UserResource;
+use App\Filament\Resources\WishlistResource;
+use App\Http\Middleware\IsAdmin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -31,6 +45,25 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->resources([
+                // PIM System
+                AttributeResource::class,
+                AttributeValueResource::class,
+                AppObjectResource::class,
+                // Games & Catalog
+                GameResource::class,
+                GenreResource::class,
+                PlatformResource::class,
+                DeveloperResource::class,
+                // Content
+                PostResource::class,
+                CommentResource::class,
+                CommunityResource::class,
+                // Users
+                UserResource::class,
+                WishlistResource::class,
+                ContactResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
@@ -53,6 +86,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                IsAdmin::class,
             ]);
     }
 }
