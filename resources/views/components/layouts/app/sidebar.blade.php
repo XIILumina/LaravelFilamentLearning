@@ -11,6 +11,12 @@
                 <x-app-logo />
             </a>
 
+            <!-- Quick Action Buttons -->
+            <div class="flex items-center gap-2 px-2 mb-4">
+                <x-messages-dropdown />
+                <x-notification-dropdown />
+            </div>
+
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Navigation')" class="grid">
                     <flux:navlist.item 
@@ -21,12 +27,12 @@
                         class="text-zinc-700 dark:text-zinc-300"
                     >{{ __('Dashboard') }}</flux:navlist.item>
                     <flux:navlist.item 
-                        icon="puzzle-piece" 
-                        :href="route('games.index')" 
-                        :current="request()->routeIs('games.*')" 
+                        icon="fire" 
+                        :href="route('trending.index')" 
+                        :current="request()->routeIs('trending.*')" 
                         wire:navigate
                         class="text-zinc-700 dark:text-zinc-300"
-                    >{{ __('Games') }}</flux:navlist.item>
+                    >{{ __('Trending') }}</flux:navlist.item>
                     <flux:navlist.item 
                         icon="tag" 
                         :href="route('genres.index')" 
@@ -34,13 +40,6 @@
                         wire:navigate
                         class="text-zinc-700 dark:text-zinc-300"
                     >{{ __('Genres') }}</flux:navlist.item>
-                    <flux:navlist.item 
-                        icon="heart" 
-                        :href="route('wishlist.index')" 
-                        :current="request()->routeIs('wishlist.*')" 
-                        wire:navigate
-                        class="text-zinc-700 dark:text-zinc-300"
-                    >{{ __('My Wishlist') }}</flux:navlist.item>
                 </flux:navlist.group>
                 
                 <flux:navlist.group :heading="__('Community')" class="grid">
@@ -60,6 +59,27 @@
                     >{{ __('Communities') }}</flux:navlist.item>
                     <flux:navlist.item 
                         icon="envelope" 
+                        :href="route('messages.index')" 
+                        :current="request()->routeIs('messages.*')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('Messages') }}</flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="bell" 
+                        :href="route('inbox.index')" 
+                        :current="request()->routeIs('inbox.*')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >
+                        <span>{{ __('Inbox') }}</span>
+                        @if(auth()->user()->getUnreadNotificationCount() > 0)
+                            <span class="ml-auto bg-orange-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                                {{ auth()->user()->getUnreadNotificationCount() }}
+                            </span>
+                        @endif
+                    </flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="paper-airplane" 
                         :href="route('contact.index')" 
                         :current="request()->routeIs('contact.*')" 
                         wire:navigate
@@ -134,6 +154,12 @@
             <flux:sidebar.toggle class="lg:hidden text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200" icon="bars-2" inset="left" />
 
             <flux:spacer />
+
+            <!-- Mobile Quick Actions -->
+            <div class="flex items-center gap-2 mr-2">
+                <x-messages-dropdown />
+                <x-notification-dropdown />
+            </div>
 
             <flux:dropdown position="top" align="end">
                 <flux:profile

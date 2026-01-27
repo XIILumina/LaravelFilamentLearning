@@ -21,6 +21,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'role',
@@ -78,10 +79,6 @@ class User extends Authenticatable
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
     }
-    public function wishlistGames()
-    {
-        return $this->belongsToMany(Game::class, 'wishlists');
-    }
 
     public function posts()
     {
@@ -131,5 +128,30 @@ class User extends Authenticatable
     public function isModeratorOf(Community $community): bool
     {
         return $this->moderatedCommunities()->where('community_id', $community->id)->exists();
+    }
+
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function receivedMessages()
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class)->orderBy('created_at', 'desc');
+    }
+
+    public function unreadNotifications()
+    {
+        return $this->hasMany(Notification::class)->where('is_read', false);
+    }
+
+    public function getUnreadNotificationCount(): int
+    {
+        return $this->unreadNotifications()->count();
     }
 }

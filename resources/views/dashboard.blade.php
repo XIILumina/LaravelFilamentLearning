@@ -141,8 +141,8 @@
                             <h3 class="font-semibold text-white mb-3 text-sm">Your Stats</h3>
                             <div class="grid grid-cols-3 gap-3 text-center">
                                 <div>
-                                    <p class="text-lg font-bold text-white">{{ auth()->user()->wishlistGames()->count() }}</p>
-                                    <p class="text-[10px] text-zinc-500">Wishlist</p>
+                                    <p class="text-lg font-bold text-white">{{ auth()->user()->receivedMessages()->count() }}</p>
+                                    <p class="text-[10px] text-zinc-500">Messages</p>
                                 </div>
                                 <div>
                                     <p class="text-lg font-bold text-white">{{ auth()->user()->posts()->count() }}</p>

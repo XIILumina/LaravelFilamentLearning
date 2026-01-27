@@ -18,6 +18,17 @@
                 :placeholder="__('Full name')"
             />
 
+            <!-- Username -->
+            <flux:input
+                name="username"
+                :label="__('Username')"
+                type="text"
+                required
+                autocomplete="username"
+                :placeholder="__('Choose a unique username (e.g., @username)')"
+                description="This will be used for mentions and your profile"
+            />
+
             <!-- Email Address -->
             <flux:input
                 name="email"

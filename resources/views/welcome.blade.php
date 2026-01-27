@@ -23,7 +23,7 @@
 
                     <!-- Desktop Nav Links -->
                     <div class="hidden md:flex items-center gap-6">
-                        <a href="{{ route('games.index') }}" class="text-sm text-zinc-400 hover:text-white transition-colors">Games</a>
+                        <a href="{{ route('games.index') }}" class="text-sm text-zinc-400 hover:text-white transition-colors">Trending</a>
                         <a href="{{ route('communities.index') }}" class="text-sm text-zinc-400 hover:text-white transition-colors">Communities</a>
                         <a href="{{ route('blog.index') }}" class="text-sm text-zinc-400 hover:text-white transition-colors">Blog</a>
                     </div>
@@ -64,10 +64,10 @@
                 </p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
                     <a href="{{ route('communities.index') }}" class="px-8 py-3 rounded-xl bg-orange-500 text-white font-medium hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40">
-                        Explore Communities
+                        Explore!
                     </a>
                     <a href="{{ route('games.index') }}" class="px-8 py-3 rounded-xl border border-zinc-700 text-zinc-300 font-medium hover:border-zinc-500 hover:text-white transition-colors">
-                        Browse Games
+                        Trending Games
                     </a>
                 </div>
             </div>

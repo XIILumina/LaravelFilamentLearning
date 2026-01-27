@@ -2,4 +2,7 @@
     <flux:main>
         {{ $slot }}
     </flux:main>
+    
+    <!-- Sticky Footer -->
+    <x-sticky-footer />
 </x-layouts.app.sidebar>

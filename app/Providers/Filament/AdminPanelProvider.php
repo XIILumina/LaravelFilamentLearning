@@ -13,7 +13,6 @@ use App\Filament\Resources\GameResource;
 use App\Filament\Resources\GenreResource;
 use App\Filament\Resources\PlatformResource;
 use App\Filament\Resources\PostResource;
-use App\Filament\Resources\UserResource;
 use App\Filament\Resources\WishlistResource;
 use App\Http\Middleware\IsAdmin;
 use Filament\Http\Middleware\Authenticate;
@@ -60,7 +59,6 @@ class AdminPanelProvider extends PanelProvider
                 CommentResource::class,
                 CommunityResource::class,
                 // Users
-                UserResource::class,
                 WishlistResource::class,
                 ContactResource::class,
             ])

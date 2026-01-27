@@ -5,15 +5,18 @@ use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\FrontObjectController;
 use App\Http\Controllers\FrontGameController;
+use App\Http\Controllers\TrendingController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\PlatformController;
-use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostLikeController;
 use App\Http\Controllers\CommentLikeController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ModerationController;
 use App\Http\Controllers\Admin\GameController as AdminGameController;
@@ -34,18 +37,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/objects', [FrontObjectController::class, 'index'])->name('objects.index');
     Route::get('/objects/{object}', [FrontObjectController::class, 'show'])->name('objects.show');
 
+    // Trending route - shows most subscribed communities and popular posts
+    Route::get('/trending', [TrendingController::class, 'index'])->name('trending.index');
+
+    // Keep games routes for direct access
     Route::get('/games', [FrontGameController::class, 'index'])->name('games.index');
     Route::get('/games/{game}', [FrontGameController::class, 'show'])->name('games.show');
 
     Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
     Route::get('/genres/{genre}', [GenreController::class, 'show'])->name('genres.show');
     Route::get('/platforms', [PlatformController::class, 'index'])->name('platforms.index');
-
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-        Route::post('/wishlist/add/{game}', [WishlistController::class, 'store'])->name('wishlist.add');
-        Route::delete('/wishlist/remove/{game}', [WishlistController::class, 'destroy'])->name('wishlist.remove');
-    });
 
     // Blog routes
     Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
@@ -84,6 +85,26 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
     Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
+
+    // Messages/Chat routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+        Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
+        Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
+    });
+
+    // Notifications/Inbox routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/inbox', [NotificationController::class, 'index'])->name('inbox.index');
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    });
+
+    // Profile routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/profile', [ProfileController::class, 'myProfile'])->name('profile.show');
+        Route::get('/user/{user}', [ProfileController::class, 'show'])->name('user.profile');
+    });
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('user-password.edit');

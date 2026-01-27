@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\Game;
 use App\Models\Community;
 use App\Services\TextFilterService;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -13,10 +14,12 @@ use Illuminate\Support\Facades\Storage;
 class BlogController extends Controller
 {
     protected TextFilterService $filterService;
+    protected NotificationService $notificationService;
 
-    public function __construct(TextFilterService $filterService)
+    public function __construct(TextFilterService $filterService, NotificationService $notificationService)
     {
         $this->filterService = $filterService;
+        $this->notificationService = $notificationService;
     }
     public function index(Request $request)
     {
@@ -112,6 +115,18 @@ class BlogController extends Controller
         // Update community post count and last post time
         if ($post->community) {
             $post->community->updatePostCount();
+        }
+
+        // Process mentions and send notifications
+        $this->notificationService->processContentMentions(
+            $request->get('title') . ' ' . $request->get('content'),
+            $post,
+            Auth::user()
+        );
+
+        // Notify community subscribers about new post (if in a community)
+        if ($post->community_id) {
+            $this->notificationService->notifyNewPost($post, Auth::user());
         }
 
         return redirect()->route('blog.index')->with('success', 'Post created successfully!');
