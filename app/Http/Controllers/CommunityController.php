@@ -27,7 +27,8 @@ class CommunityController extends Controller
             abort(404);
         }
 
-        $community->load(['game', 'subscribers']);
+        $community->load(['game', 'subscribers'])
+                  ->loadCount('posts');
         
         $posts = $community->posts()
             ->with(['user', 'game', 'community'])
@@ -47,7 +48,8 @@ class CommunityController extends Controller
             abort(404);
         }
 
-        $post->load(['user', 'game', 'community', 'comments.user', 'comments.replies.user']);
+        $post->load(['user', 'game', 'community', 'comments.user', 'comments.replies.user'])
+             ->loadCount(['likes', 'comments']);
 
         return view('communities.post', compact('community', 'post'));
     }

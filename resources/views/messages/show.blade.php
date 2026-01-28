@@ -13,9 +13,7 @@
 
                 <div class="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
                     <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center text-white font-semibold text-lg">
-                            {{ $user->initials() }}
-                        </div>
+                        <x-avatar :user="$user" size="lg" />
                         <div>
                             <h1 class="text-2xl font-bold text-white">{{ $user->name }}</h1>
                             @if($user->username)
@@ -34,9 +32,7 @@
                         <div class="flex {{ $message->sender_id === auth()->id() ? 'justify-end' : 'justify-start' }}">
                             <div class="max-w-md">
                                 <div class="flex items-end gap-2 {{ $message->sender_id === auth()->id() ? 'flex-row-reverse' : '' }}">
-                                    <div class="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                                        {{ $message->sender->initials() }}
-                                    </div>
+                                    <x-avatar :user="$message->sender" size="sm" class="flex-shrink-0" />
                                     <div>
                                         <div class="px-4 py-2 rounded-lg {{ $message->sender_id === auth()->id() ? 'bg-orange-600 text-white' : 'bg-zinc-800 text-white' }}">
                                             <p class="break-words">{{ $message->message }}</p>

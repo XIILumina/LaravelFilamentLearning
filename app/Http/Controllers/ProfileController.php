@@ -95,4 +95,37 @@ class ProfileController extends Controller
 
         return redirect()->route('user.profile', $user)->with('success', 'Comment deleted!');
     }
+
+    public function updateProfilePicture(Request $request)
+    {
+        $request->validate([
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = Auth::user();
+
+        // Delete old profile picture if exists
+        if ($user->profile_picture) {
+            \Storage::disk('public')->delete($user->profile_picture);
+        }
+
+        // Store new profile picture
+        $path = $request->file('profile_picture')->store('profile-pictures', 'public');
+
+        $user->update(['profile_picture' => $path]);
+
+        return redirect()->back()->with('success', 'Profile picture updated successfully!');
+    }
+
+    public function deleteProfilePicture()
+    {
+        $user = Auth::user();
+
+        if ($user->profile_picture) {
+            \Storage::disk('public')->delete($user->profile_picture);
+            $user->update(['profile_picture' => null]);
+        }
+
+        return redirect()->back()->with('success', 'Profile picture removed successfully!');
+    }
 }

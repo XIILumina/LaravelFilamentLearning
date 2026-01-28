@@ -57,9 +57,7 @@
                    class="block px-4 py-3 hover:bg-zinc-800 transition-colors border-b border-zinc-800/50 {{ $isUnread ? 'bg-zinc-850/50' : '' }}">
                     <div class="flex items-center gap-3">
                         <div class="flex-shrink-0">
-                            <div class="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center text-white font-semibold">
-                                {{ $otherUser->initials() }}
-                            </div>
+                            <x-avatar :user="$otherUser" size="md" />
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-white {{ $isUnread ? 'font-semibold' : '' }}">

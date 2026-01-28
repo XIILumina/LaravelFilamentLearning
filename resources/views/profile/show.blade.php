@@ -6,9 +6,7 @@
                 <div class="flex items-start gap-6">
                     <!-- Avatar -->
                     <div class="flex-shrink-0">
-                        <div class="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center text-white text-3xl font-bold shadow-xl">
-                            {{ $user->initials() }}
-                        </div>
+                        <x-avatar :user="$user" size="xl" class="shadow-xl" />
                     </div>
 
                     <!-- User Info -->

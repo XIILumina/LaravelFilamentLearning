@@ -17,9 +17,7 @@
                         <a href="{{ route('messages.show', $conversationUser) }}" 
                            class="bg-zinc-900 rounded-lg p-6 hover:bg-zinc-800 transition-all hover:scale-105 border border-zinc-800 hover:border-orange-500/50">
                             <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center text-white font-semibold">
-                                    {{ $conversationUser->initials() }}
-                                </div>
+                                <x-avatar :user="$conversationUser" size="lg" />
                                 <div class="flex-1 min-w-0">
                                     <h3 class="text-lg font-semibold text-white truncate">{{ $conversationUser->name }}</h3>
                                     @if($conversationUser->username)

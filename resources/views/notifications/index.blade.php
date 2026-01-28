@@ -1,5 +1,5 @@
 <x-layouts.app title="Inbox">
-    <div class="min-h-screen bg-zinc-950 py-8">
+    <div class="min-h-screen bg-zinc-950 py-8 pb-96">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-8 flex items-center justify-between">
@@ -33,27 +33,49 @@
                     </h2>
                     <div class="space-y-4">
                         @foreach($announcements as $announcement)
-                            <div class="bg-gradient-to-r from-orange-900/20 to-zinc-900 border border-orange-500/30 rounded-lg p-6">
-                                <div class="flex items-start gap-4">
-                                    <div class="flex-shrink-0 mt-1">
+                            <div class="bg-gradient-to-r from-orange-900/20 to-zinc-900 border border-orange-500/30 rounded-lg p-4 sm:p-6">
+                                <div class="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
+                                    <div class="flex-shrink-0">
                                         @if($announcement->type === 'maintenance')
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                            </svg>
+                                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                            </div>
                                         @elseif($announcement->type === 'event')
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
+                                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                        @elseif($announcement->type === 'update')
+                                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                                </svg>
+                                            </div>
                                         @else
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
+                                            <div class="w-10 h-10 sm:w-12 sm:h-12 bg-orange-500/10 rounded-lg flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                                                </svg>
+                                            </div>
                                         @endif
                                     </div>
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-semibold text-white mb-2">{{ $announcement->title }}</h3>
-                                        <p class="text-zinc-300 mb-3">{{ $announcement->content }}</p>
-                                        <p class="text-sm text-zinc-500">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-start justify-between gap-2 mb-2">
+                                            <h3 class="text-base sm:text-lg font-semibold text-white">{{ $announcement->title }}</h3>
+                                            <span class="flex-shrink-0 px-2 py-1 text-xs font-medium rounded-full {{ 
+                                                $announcement->type === 'maintenance' ? 'bg-yellow-500/10 text-yellow-500' : 
+                                                ($announcement->type === 'event' ? 'bg-green-500/10 text-green-500' : 
+                                                ($announcement->type === 'update' ? 'bg-blue-500/10 text-blue-500' : 
+                                                'bg-orange-500/10 text-orange-500'))
+                                            }}">
+                                                {{ ucfirst($announcement->type) }}
+                                            </span>
+                                        </div>
+                                        <p class="text-sm sm:text-base text-zinc-300 mb-2">{{ $announcement->content }}</p>
+                                        <p class="text-xs sm:text-sm text-zinc-500">
                                             {{ $announcement->published_at ? $announcement->published_at->diffForHumans() : $announcement->created_at->diffForHumans() }}
                                         </p>
                                     </div>

@@ -18,6 +18,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ConnectionController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ModerationController;
 use App\Http\Controllers\Admin\GameController as AdminGameController;
@@ -44,6 +45,13 @@ Route::middleware(['auth'])->group(function () {
     // Keep games routes for direct access
     Route::get('/games', [FrontGameController::class, 'index'])->name('games.index');
     Route::get('/games/{game}', [FrontGameController::class, 'show'])->name('games.show');
+
+    // Wishlist routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+        Route::post('/wishlist/{game}', [WishlistController::class, 'store'])->name('wishlist.add');
+        Route::delete('/wishlist/{game}', [WishlistController::class, 'destroy'])->name('wishlist.remove');
+    });
 
     Route::get('/genres', [GenreController::class, 'index'])->name('genres.index');
     Route::get('/genres/{genre}', [GenreController::class, 'show'])->name('genres.show');
@@ -120,6 +128,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/user/{user}/post/{profilePost}', [ProfileController::class, 'deletePost'])->name('profile.post.delete');
         Route::post('/user/{user}/post/{profilePost}/comment', [ProfileController::class, 'storeComment'])->name('profile.comment');
         Route::delete('/user/{user}/post/{profilePost}/comment/{comment}', [ProfileController::class, 'deleteComment'])->name('profile.comment.delete');
+        
+        // Profile picture upload
+        Route::post('/profile/picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.picture.update');
+        Route::delete('/profile/picture', [ProfileController::class, 'deleteProfilePicture'])->name('profile.picture.delete');
     });
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');

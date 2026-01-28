@@ -61,7 +61,7 @@
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clip-rule="evenodd"/>
                         </svg>
-                        <span class="font-medium text-white">{{ number_format($community->post_count) }}</span> posts
+                        <span class="font-medium text-white">{{ number_format($community->posts_count ?? $community->post_count ?? 0) }}</span> posts
                     </span>
                 </div>
 
@@ -117,17 +117,37 @@
                                     <div class="flex gap-3 p-4">
                                         <!-- Vote Column -->
                                         <div class="flex flex-col items-center gap-1 shrink-0">
-                                            <button class="text-zinc-500 hover:text-orange-500 transition p-1">
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M10 3a1 1 0 01.707.293l7 7a1 1 0 01-1.414 1.414L10 5.414 3.707 11.707a1 1 0 01-1.414-1.414l7-7A1 1 0 0110 3z"/>
-                                                </svg>
-                                            </button>
-                                            <span class="text-sm font-bold text-zinc-400">{{ $post->likes_count ?? 0 }}</span>
-                                            <button class="text-zinc-500 hover:text-blue-500 transition p-1">
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M10 17a1 1 0 01-.707-.293l-7-7a1 1 0 011.414-1.414L10 14.586l6.293-6.293a1 1 0 011.414 1.414l-7 7A1 1 0 0110 17z"/>
-                                                </svg>
-                                            </button>
+                                            @auth
+                                                <button onclick="togglePostLike({{ $post->id }}, 'like')" 
+                                                        class="upvote-btn text-zinc-500 hover:text-orange-500 transition p-1 {{ $post->isLikedBy(Auth::user()) ? 'text-orange-500' : '' }}"
+                                                        data-post-id="{{ $post->id }}">
+                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M10 3a1 1 0 01.707.293l7 7a1 1 0 01-1.414 1.414L10 5.414 3.707 11.707a1 1 0 01-1.414-1.414l7-7A1 1 0 0110 3z"/>
+                                                    </svg>
+                                                </button>
+                                            @else
+                                                <a href="{{ route('login') }}" class="text-zinc-500 hover:text-orange-500 transition p-1">
+                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M10 3a1 1 0 01.707.293l7 7a1 1 0 01-1.414 1.414L10 5.414 3.707 11.707a1 1 0 01-1.414-1.414l7-7A1 1 0 0110 3z"/>
+                                                    </svg>
+                                                </a>
+                                            @endauth
+                                            <span class="text-sm font-bold text-zinc-400 likes-count" data-post-id="{{ $post->id }}">{{ $post->likes_count ?? 0 }}</span>
+                                            @auth
+                                                <button onclick="togglePostLike({{ $post->id }}, 'dislike')" 
+                                                        class="downvote-btn text-zinc-500 hover:text-blue-500 transition p-1 {{ $post->isDislikedBy(Auth::user()) ? 'text-blue-500' : '' }}"
+                                                        data-post-id="{{ $post->id }}">
+                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M10 17a1 1 0 01-.707-.293l-7-7a1 1 0 011.414-1.414L10 14.586l6.293-6.293a1 1 0 011.414 1.414l-7 7A1 1 0 0110 17z"/>
+                                                    </svg>
+                                                </button>
+                                            @else
+                                                <a href="{{ route('login') }}" class="text-zinc-500 hover:text-blue-500 transition p-1">
+                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M10 17a1 1 0 01-.707-.293l-7-7a1 1 0 011.414-1.414L10 14.586l6.293-6.293a1 1 0 011.414 1.414l-7 7A1 1 0 0110 17z"/>
+                                                    </svg>
+                                                </a>
+                                            @endauth
                                         </div>
                                         
                                         <!-- Post Content -->
@@ -229,7 +249,7 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-zinc-500">Posts</span>
-                                    <span class="text-white font-medium">{{ number_format($community->post_count) }}</span>
+                                    <span class="text-white font-medium">{{ number_format($community->posts_count ?? $community->post_count ?? 0) }}</span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-zinc-500">Created</span>
@@ -309,4 +329,75 @@
             </div>
         </div>
     </div>
+
+    <!-- Like/Dislike JavaScript -->
+    <script>
+        async function togglePostLike(postId, type) {
+            console.log('Toggling like:', postId, type);
+            
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (!csrfToken) {
+                    console.error('CSRF token not found');
+                    alert('CSRF token missing. Please refresh the page.');
+                    return;
+                }
+
+                const response = await fetch(`/blog/posts/${postId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+                    },
+                    body: JSON.stringify({ type: type })
+                });
+
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server error:', errorText);
+                    alert('Error: ' + response.status);
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success) {
+                    // Update count
+                    const countElement = document.querySelector(`.likes-count[data-post-id="${postId}"]`);
+                    if (countElement) {
+                        countElement.textContent = data.likes_count ?? 0;
+                    }
+
+                    // Update button states
+                    const upvoteBtn = document.querySelector(`.upvote-btn[data-post-id="${postId}"]`);
+                    const downvoteBtn = document.querySelector(`.downvote-btn[data-post-id="${postId}"]`);
+
+                    if (upvoteBtn && downvoteBtn) {
+                        if (data.user_reaction === 'like') {
+                            upvoteBtn.classList.add('text-orange-500');
+                            upvoteBtn.classList.remove('text-zinc-500');
+                            downvoteBtn.classList.remove('text-blue-500');
+                            downvoteBtn.classList.add('text-zinc-500');
+                        } else if (data.user_reaction === 'dislike') {
+                            downvoteBtn.classList.add('text-blue-500');
+                            downvoteBtn.classList.remove('text-zinc-500');
+                            upvoteBtn.classList.remove('text-orange-500');
+                            upvoteBtn.classList.add('text-zinc-500');
+                        } else {
+                            upvoteBtn.classList.remove('text-orange-500');
+                            upvoteBtn.classList.add('text-zinc-500');
+                            downvoteBtn.classList.remove('text-blue-500');
+                            downvoteBtn.classList.add('text-zinc-500');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred: ' + error.message);
+            }
+        }
+    </script>
 </x-layouts.app>

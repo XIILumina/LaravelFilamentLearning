@@ -1,10 +1,12 @@
+@php
+    $comments = $comments ?? $post->comments ?? collect();
+@endphp
+
 @foreach($comments as $comment)
     <div class="comment p-5 sm:p-6" id="comment-{{ $comment->id }}">
         <div class="flex gap-3">
             <!-- User Avatar -->
-            <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">
-                {{ $comment->user->initials() }}
-            </div>
+            <x-avatar :user="$comment->user" size="sm" class="shrink-0" />
             
             <div class="flex-1 min-w-0">
                 <!-- Comment Header -->
@@ -76,9 +78,7 @@
                             @csrf
                             <input type="hidden" name="parent_id" value="{{ $comment->id }}">
                             <div class="flex gap-2">
-                                <div class="w-6 h-6 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-[10px] shrink-0">
-                                    {{ auth()->user()->initials() }}
-                                </div>
+                                <x-avatar :user="auth()->user()" size="xs" class="shrink-0" />
                                 <div class="flex-1">
                                     <textarea name="content" 
                                               rows="2" 

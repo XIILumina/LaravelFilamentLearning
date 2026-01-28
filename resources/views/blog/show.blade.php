@@ -22,9 +22,7 @@
                         <!-- Author & Meta -->
                         <div class="flex items-start justify-between mb-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                    {{ $post->user->initials() }}
-                                </div>
+                                <x-avatar :user="$post->user" size="md" />
                                 <div>
                                     <div class="flex items-center gap-2">
                                         <span class="font-medium text-white">{{ $post->user->name }}</span>
@@ -140,9 +138,7 @@
                         <div class="p-5 sm:p-6 border-b border-zinc-800">
                             <form method="POST" action="{{ route('comments.store', $post) }}" class="flex gap-3">
                                 @csrf
-                                <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">
-                                    {{ auth()->user()->initials() }}
-                                </div>
+                                <x-avatar :user="auth()->user()" size="sm" class="shrink-0" />
                                 <div class="flex-1">
                                     <textarea name="content" 
                                               rows="2" 

@@ -25,23 +25,61 @@ class AnnouncementResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Section::make('Quick Templates')
+                    ->description('Click a template to auto-fill the form')
+                    ->schema([
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('template_new_feature')
+                                ->label('🎉 New Feature')
+                                ->action(function ($set) {
+                                    $set('title', 'New Feature: [Feature Name]');
+                                    $set('content', "We're excited to announce a new feature! [Describe the feature and how to use it]. Try it out now!");
+                                    $set('type', 'update');
+                                }),
+                            Forms\Components\Actions\Action::make('template_maintenance')
+                                ->label('🔧 Maintenance')
+                                ->action(function ($set) {
+                                    $set('title', 'Scheduled Maintenance');
+                                    $set('content', "We'll be performing scheduled maintenance on [Date] at [Time]. Expected downtime: [Duration]. Thank you for your patience!");
+                                    $set('type', 'maintenance');
+                                }),
+                            Forms\Components\Actions\Action::make('template_event')
+                                ->label('🎮 Event')
+                                ->action(function ($set) {
+                                    $set('title', '[Event Name] - Join Us!');
+                                    $set('content', "Don't miss out on our [Event Name]! Starting [Date] at [Time]. [Event details and rewards]. See you there!");
+                                    $set('type', 'event');
+                                }),
+                            Forms\Components\Actions\Action::make('template_community')
+                                ->label('💬 Community Update')
+                                ->action(function ($set) {
+                                    $set('title', 'Community Update');
+                                    $set('content', "Hello gamers! [Share community news, achievements, or upcoming changes]. Thanks for being part of our community!");
+                                    $set('type', 'general');
+                                }),
+                        ])
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsed(false),
                 Forms\Components\Section::make('Announcement Details')
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->required()
                             ->maxLength(255)
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->placeholder('e.g., "New Games Added This Week!"'),
                         Forms\Components\Textarea::make('content')
                             ->required()
                             ->rows(5)
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->placeholder('Write your announcement message here...'),
                         Forms\Components\Select::make('type')
                             ->required()
                             ->options([
-                                'general' => 'General',
-                                'update' => 'Update',
-                                'maintenance' => 'Maintenance',
-                                'event' => 'Event',
+                                'general' => '📢 General',
+                                'update' => '🔔 Update',
+                                'maintenance' => '🔧 Maintenance',
+                                'event' => '🎉 Event',
                             ])
                             ->default('general'),
                     ]),
@@ -53,10 +91,12 @@ class AnnouncementResource extends Resource
                             ->helperText('Toggle to show/hide this announcement'),
                         Forms\Components\DateTimePicker::make('published_at')
                             ->label('Publish Date')
-                            ->helperText('Leave empty to publish immediately'),
+                            ->helperText('Leave empty to publish immediately')
+                            ->native(false),
                         Forms\Components\DateTimePicker::make('expires_at')
                             ->label('Expiration Date')
-                            ->helperText('Leave empty for no expiration'),
+                            ->helperText('Leave empty for no expiration')
+                            ->native(false),
                     ])
                     ->columns(3),
             ]);

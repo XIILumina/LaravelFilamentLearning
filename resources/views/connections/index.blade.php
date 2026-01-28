@@ -58,9 +58,7 @@
                             @foreach($friends as $friend)
                                 <div class="bg-zinc-800/30 border border-zinc-700/30 rounded-2xl p-4 hover:border-zinc-600/50 transition-colors">
                                     <div class="flex items-center gap-4 mb-4">
-                                        <div class="w-12 h-12 bg-zinc-700 rounded-full flex items-center justify-center text-white font-semibold">
-                                            {{ $friend->initials() }}
-                                        </div>
+                                        <x-avatar :user="$friend" size="lg" />
                                         <div class="flex-1">
                                             <h3 class="font-semibold text-white">{{ $friend->name }}</h3>
                                             <p class="text-sm text-zinc-500">@<span>{{ $friend->username ?? 'user' }}</span></p>
@@ -107,9 +105,7 @@
                             @foreach($requests as $request)
                                 <div class="bg-zinc-800/30 border border-zinc-700/30 rounded-2xl p-4 flex items-center justify-between">
                                     <div class="flex items-center gap-4">
-                                        <div class="w-12 h-12 bg-zinc-700 rounded-full flex items-center justify-center text-white font-semibold">
-                                            {{ $request->user->initials() }}
-                                        </div>
+                                        <x-avatar :user="$request->user" size="lg" />
                                         <div>
                                             <h3 class="font-semibold text-white">{{ $request->user->name }}</h3>
                                             <p class="text-sm text-zinc-500">@<span>{{ $request->user->username ?? 'user' }}</span></p>
@@ -158,9 +154,7 @@
                             @foreach($suggestedUsers as $user)
                                 <div class="bg-zinc-800/30 border border-zinc-700/30 rounded-2xl p-4 hover:border-zinc-600/50 transition-colors">
                                     <div class="flex items-center gap-4 mb-4">
-                                        <div class="w-12 h-12 bg-zinc-700 rounded-full flex items-center justify-center text-white font-semibold">
-                                            {{ $user->initials() }}
-                                        </div>
+                                        <x-avatar :user="$user" size="lg" />
                                         <div class="flex-1">
                                             <h3 class="font-semibold text-white">{{ $user->name }}</h3>
                                             <p class="text-sm text-zinc-500">@<span>{{ $user->username ?? 'user' }}</span></p>

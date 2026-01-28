@@ -1,5 +1,5 @@
 <x-layouts.app :title="$post->title">
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8 pb-96">
         <!-- Breadcrumb -->
         <nav class="mb-6">
             <ol class="flex items-center space-x-2 text-sm text-zinc-400">
@@ -230,5 +230,62 @@
                 console.error('Error:', error);
             }
         }
+
+        async function toggleCommentLike(commentId, isLike) {
+            try {
+                const response = await fetch(`/blog/comments/${commentId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ is_like: isLike })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update the counts in the UI
+                    const likeBtn = document.querySelector(`button[onclick="toggleCommentLike(${commentId}, true)"]`);
+                    const dislikeBtn = document.querySelector(`button[onclick="toggleCommentLike(${commentId}, false)"]`);
+                    
+                    if (likeBtn && dislikeBtn) {
+                        const likeCount = likeBtn.querySelector('.like-count');
+                        const dislikeCount = dislikeBtn.querySelector('.dislike-count');
+                        
+                        if (likeCount) likeCount.textContent = data.likes_count || 0;
+                        if (dislikeCount) dislikeCount.textContent = data.dislikes_count || 0;
+
+                        // Update button states based on user's current reaction
+                        if (data.user_reaction === 'like') {
+                            likeBtn.classList.remove('text-zinc-400', 'hover:text-green-400');
+                            likeBtn.classList.add('text-green-500');
+                            dislikeBtn.classList.remove('text-red-500');
+                            dislikeBtn.classList.add('text-zinc-400', 'hover:text-red-400');
+                        } else if (data.user_reaction === 'dislike') {
+                            dislikeBtn.classList.remove('text-zinc-400', 'hover:text-red-400');
+                            dislikeBtn.classList.add('text-red-500');
+                            likeBtn.classList.remove('text-green-500');
+                            likeBtn.classList.add('text-zinc-400', 'hover:text-green-400');
+                        } else {
+                            // No reaction
+                            likeBtn.classList.remove('text-green-500');
+                            likeBtn.classList.add('text-zinc-400', 'hover:text-green-400');
+                            dislikeBtn.classList.remove('text-red-500');
+                            dislikeBtn.classList.add('text-zinc-400', 'hover:text-red-400');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling comment like:', error);
+            }
+        }
     </script>
+    
+    <!-- Sticky Footer -->
+    <x-sticky-footer />
 </x-layouts.app>
