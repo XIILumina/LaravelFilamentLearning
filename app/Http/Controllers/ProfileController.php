@@ -128,4 +128,37 @@ class ProfileController extends Controller
 
         return redirect()->back()->with('success', 'Profile picture removed successfully!');
     }
+
+    public function updateProfileBanner(Request $request)
+    {
+        $request->validate([
+            'profile_banner' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB max
+        ]);
+
+        $user = Auth::user();
+
+        // Delete old banner if exists
+        if ($user->profile_banner) {
+            \Storage::disk('public')->delete($user->profile_banner);
+        }
+
+        // Store new banner
+        $path = $request->file('profile_banner')->store('profile-banners', 'public');
+
+        $user->update(['profile_banner' => $path]);
+
+        return redirect()->back()->with('success', 'Profile banner updated successfully!');
+    }
+
+    public function deleteProfileBanner()
+    {
+        $user = Auth::user();
+
+        if ($user->profile_banner) {
+            \Storage::disk('public')->delete($user->profile_banner);
+            $user->update(['profile_banner' => null]);
+        }
+
+        return redirect()->back()->with('success', 'Profile banner removed successfully!');
+    }
 }

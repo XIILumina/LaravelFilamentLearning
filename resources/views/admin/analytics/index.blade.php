@@ -69,7 +69,7 @@
                         <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
                             <div>
                                 <p class="font-medium text-slate-900 dark:text-white">{{ $author->user->name }}</p>
-                                <p class="text-sm text-slate-600 dark:text-slate-400">{{ $author->user->email }}</p>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">{{ $author->user->username ? '@' . $author->user->username : 'User' }}</p>
                             </div>
                             <div class="text-right">
                                 <p class="font-bold text-indigo-600">{{ $author->post_count }}</p>

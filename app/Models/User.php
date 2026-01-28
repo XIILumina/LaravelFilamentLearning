@@ -26,6 +26,7 @@ class User extends Authenticatable
         'password',
         'role',
         'profile_picture',
+        'profile_banner',
     ];
 
     /**
@@ -88,6 +89,17 @@ class User extends Authenticatable
     {
         if ($this->profile_picture) {
             return asset('storage/' . $this->profile_picture);
+        }
+        return null;
+    }
+
+    /**
+     * Get the user's profile banner URL
+     */
+    public function profileBannerUrl(): ?string
+    {
+        if ($this->profile_banner) {
+            return asset('storage/' . $this->profile_banner);
         }
         return null;
     }

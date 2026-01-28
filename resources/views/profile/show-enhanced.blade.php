@@ -1,39 +1,87 @@
 <x-layouts.app :title="$user->name . ' - Profile'">
     <div class="min-h-screen bg-zinc-950 py-8 pb-96">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Profile Header -->
-            <div class="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-zinc-800 p-8 mb-6">
-                <div class="flex flex-col md:flex-row items-start gap-6">
-                    <!-- Avatar -->
-                    <div class="flex-shrink-0 relative group">
-                        <x-avatar :user="$user" size="2xl" class="shadow-2xl ring-4" />
-                        
-                        @if(auth()->id() === $user->id)
-                            <!-- Upload/Change Photo Button -->
-                            <form action="{{ route('profile.picture.update') }}" method="POST" enctype="multipart/form-data" id="profilePictureForm">
+            
+            <!-- Success Messages -->
+            @if(session('success'))
+                <div class="mb-6 bg-green-600 text-white px-6 py-4 rounded-xl">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <!-- Profile Header with Banner -->
+            <div class="bg-gradient-to-br from-zinc-900 to-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden mb-6">
+                <!-- Banner Section -->
+                <div class="relative h-48 bg-gradient-to-r from-orange-500/20 to-red-600/20">
+                    @if($user->profileBannerUrl())
+                        <img src="{{ $user->profileBannerUrl() }}" 
+                             alt="Profile banner" 
+                             class="w-full h-full object-cover">
+                    @endif
+                    
+                    @if(auth()->id() === $user->id)
+                        <div class="absolute top-4 right-4 flex gap-2">
+                            <!-- Upload Banner Button -->
+                            <form action="{{ route('profile.banner.update') }}" method="POST" enctype="multipart/form-data" id="profileBannerForm">
                                 @csrf
-                                <label for="profile_picture" class="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <label for="profile_banner" class="bg-black/60 hover:bg-black/80 text-white px-4 py-2 rounded-lg cursor-pointer transition flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
+                                    {{ $user->profile_banner ? 'Change' : 'Add' }} Banner
                                 </label>
-                                <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="document.getElementById('profilePictureForm').submit()">
+                                <input type="file" id="profile_banner" name="profile_banner" accept="image/*" class="hidden" onchange="document.getElementById('profileBannerForm').submit()">
                             </form>
                             
-                            @if($user->profile_picture)
-                                <form action="{{ route('profile.picture.delete') }}" method="POST" class="absolute -bottom-2 -right-2">
+                            @if($user->profile_banner)
+                                <form action="{{ route('profile.banner.delete') }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white rounded-full p-2 shadow-lg transition-colors" title="Remove picture">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    <button type="submit" class="bg-red-600/80 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-2" title="Remove banner">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
+                                        Remove
                                     </button>
                                 </form>
                             @endif
-                        @endif
-                    </div>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Profile Info Section -->
+                <div class="p-8">
+                    <div class="flex flex-col md:flex-row items-start gap-6">
+                        <!-- Avatar -->
+                        <div class="flex-shrink-0 relative group -mt-20">
+                            <x-avatar :user="$user" size="2xl" class="shadow-2xl ring-4 ring-zinc-900" />
+                            
+                            @if(auth()->id() === $user->id)
+                                <!-- Upload/Change Photo Button -->
+                                <form action="{{ route('profile.picture.update') }}" method="POST" enctype="multipart/form-data" id="profilePictureForm">
+                                    @csrf
+                                    <label for="profile_picture" class="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    </label>
+                                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*" class="hidden" onchange="document.getElementById('profilePictureForm').submit()">
+                                </form>
+                                
+                                @if($user->profile_picture)
+                                    <form action="{{ route('profile.picture.delete') }}" method="POST" class="absolute -bottom-2 -right-2">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white rounded-full p-2 shadow-lg transition-colors" title="Remove picture">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @endif
+                            @endif
+                        </div>
 
                     <!-- User Info -->
                     <div class="flex-1">
@@ -89,6 +137,7 @@
                             </a>
                         @endif
                     </div>
+                </div>
                 </div>
             </div>
 

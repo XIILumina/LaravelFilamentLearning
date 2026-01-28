@@ -144,7 +144,7 @@
 
                                 <div class="grid flex-1 text-start text-sm leading-tight">
                                     <span class="truncate font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</span>
-                                    <span class="truncate text-xs text-zinc-600 dark:text-zinc-400">{{ auth()->user()->email }}</span>
+                                    <span class="truncate text-xs text-zinc-600 dark:text-zinc-400">{{ auth()->user()->username ? '@' . auth()->user()->username : auth()->user()->email }}</span>
                                 </div>
                             </div>
                         </div>
@@ -197,7 +197,7 @@
 
                                 <div class="grid flex-1 text-start text-sm leading-tight">
                                     <span class="truncate font-semibold text-zinc-900 dark:text-zinc-100">{{ auth()->user()->name }}</span>
-                                    <span class="truncate text-xs text-zinc-600 dark:text-zinc-400">{{ auth()->user()->email }}</span>
+                                    <span class="truncate text-xs text-zinc-600 dark:text-zinc-400">{{ auth()->user()->username ? '@' . auth()->user()->username : auth()->user()->email }}</span>
                                 </div>
                             </div>
                         </div>

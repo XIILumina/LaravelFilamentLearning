@@ -22,8 +22,6 @@
                                     <h3 class="text-lg font-semibold text-white truncate">{{ $conversationUser->name }}</h3>
                                     @if($conversationUser->username)
                                         <p class="text-sm text-zinc-400">@{{ $conversationUser->username }}</p>
-                                    @else
-                                        <p class="text-sm text-zinc-400">{{ $conversationUser->email }}</p>
                                     @endif
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

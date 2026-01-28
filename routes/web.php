@@ -132,6 +132,10 @@ Route::middleware(['auth'])->group(function () {
         // Profile picture upload
         Route::post('/profile/picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.picture.update');
         Route::delete('/profile/picture', [ProfileController::class, 'deleteProfilePicture'])->name('profile.picture.delete');
+        
+        // Profile banner upload
+        Route::post('/profile/banner', [ProfileController::class, 'updateProfileBanner'])->name('profile.banner.update');
+        Route::delete('/profile/banner', [ProfileController::class, 'deleteProfileBanner'])->name('profile.banner.delete');
     });
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
