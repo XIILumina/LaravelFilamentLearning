@@ -17,33 +17,40 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationLabel = 'Users';
+    protected static ?string $navigationGroup = 'User Management';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Name')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('username')
+                    ->label('Username')
                     ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
+                Forms\Components\Select::make('role')
+                    ->label('Role')
+                    ->options([
+                        'user' => 'User',
+                        'admin' => 'Admin',
+                    ])
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('role')
-                    ->required(),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('two_factor_secret')
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('two_factor_recovery_codes')
-                    ->columnSpanFull(),
-                Forms\Components\DateTimePicker::make('two_factor_confirmed_at'),
+                    ->default('user'),
+                Forms\Components\DateTimePicker::make('email_verified_at')
+                    ->label('Email Verified At'),
+                    
+                // Email and Password are disabled for GDPR compliance
+                Forms\Components\Placeholder::make('email_info')
+                    ->label('Email')
+                    ->content(fn ($record) => $record?->email ?? 'Will be set on creation'),
+                Forms\Components\Placeholder::make('password_info')
+                    ->label('Password')
+                    ->content('Password cannot be edited for GDPR compliance'),
             ]);
     }
 

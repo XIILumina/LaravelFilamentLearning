@@ -154,4 +154,45 @@ class User extends Authenticatable
     {
         return $this->unreadNotifications()->count();
     }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    public function wishlistGames()
+    {
+        return $this->belongsToMany(Game::class, 'wishlists')
+            ->withTimestamps();
+    }
+
+    public function friendsOfMine()
+    {
+        return $this->belongsToMany(User::class, 'friendships', 'user_id', 'friend_id')
+            ->wherePivot('status', 'accepted')
+            ->withTimestamps();
+    }
+
+    public function friendOf()
+    {
+        return $this->belongsToMany(User::class, 'friendships', 'friend_id', 'user_id')
+            ->wherePivot('status', 'accepted')
+            ->withTimestamps();
+    }
+
+    public function friends()
+    {
+        return $this->friendsOfMine->merge($this->friendOf);
+    }
+
+    public function friendships()
+    {
+        return $this->hasMany(Friendship::class, 'user_id');
+    }
+
+    public function pendingFriendRequests()
+    {
+        return $this->hasMany(Friendship::class, 'friend_id')
+            ->where('status', 'pending');
+    }
 }

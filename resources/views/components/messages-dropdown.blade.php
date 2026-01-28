@@ -22,7 +22,7 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
-         class="absolute right-0 mt-2 w-80 origin-top-right rounded-lg bg-zinc-900 shadow-xl ring-1 ring-zinc-800 z-50"
+         class="absolute left-0 mt-2 w-80 origin-top-left rounded-lg bg-zinc-900 shadow-xl ring-1 ring-zinc-800 z-50"
          style="display: none;">
         
         <!-- Header -->

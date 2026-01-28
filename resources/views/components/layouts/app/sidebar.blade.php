@@ -58,6 +58,23 @@
                         class="text-zinc-700 dark:text-zinc-300"
                     >{{ __('Communities') }}</flux:navlist.item>
                     <flux:navlist.item 
+                        icon="users" 
+                        :href="route('connections.index')" 
+                        :current="request()->routeIs('connections.*')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >
+                        <span>{{ __('Connections') }}</span>
+                        @php
+                            $pendingCount = auth()->user()->pendingFriendRequests()->count();
+                        @endphp
+                        @if($pendingCount > 0)
+                            <span class="ml-auto bg-green-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                                {{ $pendingCount }}
+                            </span>
+                        @endif
+                    </flux:navlist.item>
+                    <flux:navlist.item 
                         icon="envelope" 
                         :href="route('messages.index')" 
                         :current="request()->routeIs('messages.*')" 

@@ -17,6 +17,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ModerationController;
 use App\Http\Controllers\Admin\GameController as AdminGameController;
@@ -98,6 +99,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/inbox', [NotificationController::class, 'index'])->name('inbox.index');
         Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    });
+
+    // Connections/Friends routes
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/connections', [ConnectionController::class, 'index'])->name('connections.index');
+        Route::post('/connections/{user}/request', [ConnectionController::class, 'request'])->name('connections.request');
+        Route::post('/connections/{user}/accept', [ConnectionController::class, 'accept'])->name('connections.accept');
+        Route::delete('/connections/{user}/decline', [ConnectionController::class, 'decline'])->name('connections.decline');
+        Route::delete('/connections/{user}/unfriend', [ConnectionController::class, 'unfriend'])->name('connections.unfriend');
     });
 
     // Profile routes

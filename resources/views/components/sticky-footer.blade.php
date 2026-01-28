@@ -16,7 +16,7 @@ x-transition:enter-end="opacity-100 translate-y-0"
 x-transition:leave="transition ease-in duration-200"
 x-transition:leave-start="opacity-100 translate-y-0"
 x-transition:leave-end="opacity-0 translate-y-full"
-class="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 z-40"
+class="bg-zinc-900 border-t border-zinc-800 mt-12"
 style="display: none;">
     
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
