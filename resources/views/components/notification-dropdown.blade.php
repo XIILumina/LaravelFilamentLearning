@@ -1,6 +1,6 @@
 <!-- Notifications Dropdown -->
-<div x-data="{ open: false }" class="relative" @click.away="open = false">
-    <button @click="open = !open" class="relative p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors">
+<div x-data="{ open: false, buttonRect: null }" class="relative" @click.away="open = false">
+    <button @click="open = !open; buttonRect = $el.getBoundingClientRect()" class="relative p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
@@ -22,7 +22,8 @@
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100 scale-100"
          x-transition:leave-end="opacity-0 scale-95"
-         class="absolute left-0 mt-2 w-96 origin-top-left rounded-lg bg-zinc-900 shadow-xl ring-1 ring-zinc-800 z-50"
+         class="fixed w-96 origin-top-left rounded-lg bg-zinc-900 shadow-xl ring-1 ring-zinc-800 z-[100]"
+         :style="buttonRect ? `top: ${buttonRect.bottom + 8}px; left: ${buttonRect.left}px;` : 'display: none;'"
          style="display: none;">
         
         <!-- Header -->

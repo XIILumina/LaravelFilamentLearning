@@ -114,6 +114,12 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['auth'])->group(function () {
         Route::get('/profile', [ProfileController::class, 'myProfile'])->name('profile.show');
         Route::get('/user/{user}', [ProfileController::class, 'show'])->name('user.profile');
+        
+        // Profile wall posts
+        Route::post('/user/{user}/post', [ProfileController::class, 'storePost'])->name('profile.post');
+        Route::delete('/user/{user}/post/{profilePost}', [ProfileController::class, 'deletePost'])->name('profile.post.delete');
+        Route::post('/user/{user}/post/{profilePost}/comment', [ProfileController::class, 'storeComment'])->name('profile.comment');
+        Route::delete('/user/{user}/post/{profilePost}/comment/{comment}', [ProfileController::class, 'deleteComment'])->name('profile.comment.delete');
     });
 
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');

@@ -1,5 +1,5 @@
 <x-layouts.app title="Contact Us">
-    <div class="min-h-screen bg-zinc-950">
+    <div class="min-h-screen bg-zinc-950 pb-96">
         <!-- Header -->
         <div class="px-4 sm:px-6 py-8 border-b border-zinc-800">
             <div class="max-w-4xl mx-auto text-center">
@@ -257,4 +257,7 @@
             updateCharCount();
         });
     </script>
+    
+    <!-- Sticky Footer -->
+    <x-sticky-footer />
 </x-layouts.app>

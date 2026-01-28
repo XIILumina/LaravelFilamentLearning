@@ -195,4 +195,14 @@ class User extends Authenticatable
         return $this->hasMany(Friendship::class, 'friend_id')
             ->where('status', 'pending');
     }
+
+    public function profilePosts()
+    {
+        return $this->hasMany(ProfilePost::class, 'user_id');
+    }
+
+    public function authoredProfilePosts()
+    {
+        return $this->hasMany(ProfilePost::class, 'author_id');
+    }
 }

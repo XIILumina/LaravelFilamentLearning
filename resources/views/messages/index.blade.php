@@ -50,4 +50,7 @@
             @endif
         </div>
     </div>
+    
+    <!-- Sticky Footer -->
+    <x-sticky-footer />
 </x-layouts.app>

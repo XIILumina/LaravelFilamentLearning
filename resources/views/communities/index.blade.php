@@ -1,5 +1,5 @@
 <x-layouts.app title="Communities">
-    <div class="min-h-screen">
+    <div class="min-h-screen pb-96">
         <!-- Header -->
         <div class="px-4 sm:px-6 py-6 border-b border-zinc-800/50">
             <div class="max-w-6xl mx-auto">
@@ -112,4 +112,7 @@
             @endif
         </div>
     </div>
+    
+    <!-- Sticky Footer -->
+    <x-sticky-footer />
 </x-layouts.app>

@@ -4,7 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-        <flux:sidebar sticky stashable class="border-e border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900">
+        <flux:sidebar sticky stashable class="border-e border-zinc-300 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 z-[60]">
             <flux:sidebar.toggle class="lg:hidden text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200" icon="x-mark" />
 
             <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse py-3 px-2 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors" wire:navigate>
@@ -74,6 +74,13 @@
                             </span>
                         @endif
                     </flux:navlist.item>
+                    <flux:navlist.item 
+                        icon="user-circle" 
+                        :href="route('profile.show')" 
+                        :current="request()->routeIs('profile.show') || request()->routeIs('user.profile')" 
+                        wire:navigate
+                        class="text-zinc-700 dark:text-zinc-300"
+                    >{{ __('Profile') }}</flux:navlist.item>
                     <flux:navlist.item 
                         icon="envelope" 
                         :href="route('messages.index')" 
@@ -151,6 +158,7 @@
                     <flux:menu.separator class="bg-zinc-300 dark:bg-zinc-700" />
 
                     <flux:menu.radio.group>
+                        <flux:menu.item :href="route('profile.show')" icon="user-circle" wire:navigate class="text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700">{{ __('Profile') }}</flux:menu.item>
                         <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate class="text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700">{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 
@@ -208,6 +216,7 @@
                     <flux:menu.separator class="bg-zinc-300 dark:bg-zinc-700" />
 
                     <flux:menu.radio.group>
+                        <flux:menu.item :href="route('profile.show')" icon="user-circle" wire:navigate class="text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700">{{ __('Profile') }}</flux:menu.item>
                         <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate class="text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700">{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 

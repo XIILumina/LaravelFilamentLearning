@@ -22,6 +22,8 @@ use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\GameAttribute;
 use App\Models\Friendship;
+use App\Models\ProfilePost;
+use App\Models\ProfilePostComment;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -424,6 +426,47 @@ class ComprehensiveDatabaseSeeder extends Seeder
                         'user_id' => $user->id,
                         'friend_id' => $friend->id,
                         'status' => rand(0, 10) > 3 ? 'accepted' : 'pending',
+                    ]);
+                }
+            }
+        }
+
+        // Create Profile Posts
+        foreach ($users->take(10) as $user) {
+            // Create posts on their own wall
+            for ($i = 0; $i < rand(2, 5); $i++) {
+                $profilePost = ProfilePost::create([
+                    'user_id' => $user->id,
+                    'author_id' => $user->id,
+                    'content' => fake()->paragraphs(rand(1, 3), true),
+                ]);
+
+                // Add comments from friends
+                $friends = $users->where('id', '!=', $user->id)->random(rand(0, 3));
+                foreach ($friends as $friend) {
+                    ProfilePostComment::create([
+                        'profile_post_id' => $profilePost->id,
+                        'user_id' => $friend->id,
+                        'content' => fake()->sentence(),
+                    ]);
+                }
+            }
+
+            // Create posts from friends on this user's wall
+            $friends = $users->where('id', '!=', $user->id)->random(rand(1, 3));
+            foreach ($friends as $friend) {
+                $profilePost = ProfilePost::create([
+                    'user_id' => $user->id,
+                    'author_id' => $friend->id,
+                    'content' => fake()->sentence() . ' ' . fake()->sentence(),
+                ]);
+
+                // Maybe add a comment from the profile owner
+                if (rand(0, 1)) {
+                    ProfilePostComment::create([
+                        'profile_post_id' => $profilePost->id,
+                        'user_id' => $user->id,
+                        'content' => fake()->sentence(),
                     ]);
                 }
             }
