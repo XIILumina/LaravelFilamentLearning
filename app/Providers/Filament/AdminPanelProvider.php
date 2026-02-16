@@ -41,8 +41,12 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Blue,
+                'gray' => Color::Slate,
             ])
+            ->brandName('Uzņēmumu Reģistra Portāls')
+            ->font('Inter')
+            ->favicon(asset('favicon.ico'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->resources([
                 // PIM System
@@ -64,12 +68,15 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                \App\Filament\Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                \App\Filament\Widgets\RegisteredEntitiesWidget::class,
+                \App\Filament\Widgets\IndustryStatsWidget::class,
+                \App\Filament\Widgets\DataCatalogChart::class,
+                \App\Filament\Widgets\RecentCompaniesWidget::class,
+                \App\Filament\Widgets\TopCategoriesWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

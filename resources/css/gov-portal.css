@@ -1,0 +1,114 @@
+/* Government Portal Custom Styles */
+
+/* Main Panel Styling */
+:root {
+    --gov-primary: #3b82f6;
+    --gov-primary-dark: #1e40af;
+    --gov-gray: #64748b;
+    --gov-light-gray: #f8fafc;
+    --gov-border: #e2e8f0;
+}
+
+/* Typography */
+.fi-topbar-item-label,
+.fi-sidebar-item-label {
+    font-weight: 500;
+}
+
+/* Make the sidebar more government-like */
+.fi-sidebar {
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+}
+
+.fi-sidebar-item-button:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* Tables - cleaner government style */
+.fi-ta-table {
+    border: 2px solid var(--gov-border);
+    border-radius: 8px;
+}
+
+.fi-ta-header-cell {
+    background: var(--gov-light-gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--gov-gray);
+}
+
+/* Buttons - more professional */
+.fi-btn-primary {
+    background: var(--gov-primary);
+    font-weight: 500;
+}
+
+.fi-btn-primary:hover {
+    background: var(--gov-primary-dark);
+}
+
+/* Cards */
+.fi-section {
+    border: 2px solid var(--gov-border);
+    border-radius: 8px;
+}
+
+.fi-section-header-heading {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+/* Stats widgets government styling */
+.fi-wi-stats-overview-stat-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gov-primary);
+}
+
+/* Form inputs */
+.fi-input {
+    border: 2px solid var(--gov-border);
+    border-radius: 6px;
+}
+
+.fi-input:focus {
+    border-color: var(--gov-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Badges */
+.fi-badge {
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+}
+
+/* Header */
+.fi-topbar {
+    border-bottom: 3px solid var(--gov-primary);
+}
+
+/* Navigation badges */
+.fi-sidebar-item-badge {
+    background: var(--gov-primary);
+}
+
+/* Modal styling */
+.fi-modal-window {
+    border-radius: 12px;
+    border: 2px solid var(--gov-border);
+}
+
+/* Footer */
+.fi-footer {
+    border-top: 2px solid var(--gov-border);
+    background: var(--gov-light-gray);
+}
