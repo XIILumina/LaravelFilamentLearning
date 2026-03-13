@@ -11,6 +11,6 @@ class Dashboard extends BaseDashboard
     protected static string $view = 'filament.pages.dashboard';
     
     protected static ?string $title = 'Datu Portāls - Uzņēmumu Reģistrs';
-    
+
     protected static ?string $navigationLabel = 'Galvenā';
 }
